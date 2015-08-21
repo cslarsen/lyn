@@ -2,10 +2,10 @@ lyn — Python bindings for GNU Lightning
 =======================================
 
 _Lyn_ provides Python bindings for GNU Lightning, the light-weight just-in-time
-compiler that translated RISC instructions to native machine code.
+compiler that translates RISC instructions to native machine code.
 
 The bindings are made through `ctypes`, so all of the Lyn source code is in
-pure Python.
+pure Python: All you need is liblightning.so/dylib/dll!
 
 Lyn is the Norwegian word for "lightning".
 
