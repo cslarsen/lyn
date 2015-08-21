@@ -1,5 +1,5 @@
-lyn -- Python bindings for GNU Lightning
-========================================
+lyn — Python bindings for GNU Lightning
+=======================================
 
 _Lyn_ provides Python bindings for GNU Lightning, the light-weight just-in-time
 compiler that translated RISC instructions to native machine code.
@@ -9,13 +9,13 @@ pure Python.
 
 Lyn is the Norwegian word for "lightning".
 
-*NOTE* This project is currently in extremely early stages (hours in!)
+**NOTE** This project is currently in extremely early stages (hours in!)
 
 Status
 ------
 
 As mentioned above, Lyn is fledgling: I've just spent a few hours on it, so
-almost nothing is supported and --- in particular --- I've only targeted x86-64
+almost nothing is supported and — in particular — I've only targeted x86-64
 opcodes just yet.
 
 In spite of this, I've managed to create a *really* simple program in Python
