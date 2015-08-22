@@ -4,7 +4,7 @@ lyn — Python bindings for GNU Lightning
 _Lyn_ provides Python bindings for GNU Lightning, the light-weight just-in-time
 compiler that translates RISC instructions to native machine code.
 
-The bindings are made through `ctypes`, so all of the Lyn source code is in
+The bindings are made through ``ctypes``, so all of the Lyn source code is in
 pure Python: All you need is liblightning.so/dylib/dll!
 
 "Lyn" is the Norwegian word for "lightning".
@@ -20,7 +20,7 @@ opcodes just yet.
 
 In spite of this, I've managed to create a *really* simple program in Python
 that is JIT-compiled to native x86-64 machine code: A glorious function that
-returns the value of 123! Here's the code:
+returns the value of 123! Here's the code::
 
     #!/usr/bin/env python
 
@@ -59,11 +59,11 @@ To download and install GNU Lightning, see
 
 Since Lyn loads Lightning using the ctypes foreign-function interface, you will
 most likely need to build a shared library. To do that, configure Lightning
-with `--enable-shared`.
+with ``--enable-shared``.
 
 If you want to be able to disassemble your compiled code, you also need GNU
-Binutils, along with a `--enable-disassembler` option to GNU Lightning's
-`configure`.  Consult its documentation for more information.
+Binutils, along with a ``--enable-disassembler`` option to GNU Lightning's
+``configure``.  Consult its documentation for more information.
 
 Author and license
 ------------------

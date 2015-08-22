@@ -1,4 +1,4 @@
-from setuptools import setup
+Erom setuptools import setup
 
 setup(
     name="lyn",
@@ -10,7 +10,7 @@ setup(
     url="https://github.com/cslarsen/lyn",
     download_url="https://github.com/cslarsen/lyn/tarball/0.0.1",
     license="https://www.gnu.org/licenses/lgpl-2.1.html",
-    long_description=open("README.md").read(),
+    long_description=open("README.rst").read(),
     zip_safe=True,
     test_suite="tests",
 
