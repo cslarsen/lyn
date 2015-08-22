@@ -19,6 +19,14 @@ import weakref
 from .codes import Code
 from .registers import Register
 
+class Node(object):
+    """A node in the code (jit_node_t pointer)."""
+    def __init__(self, jit_node_ptr):
+        self.ptr = jit_node_ptr
+
+    def __repr__(self):
+        return "<Node: jit_node_t at 0x%x>" % self.ptr
+
 
 class State(object):
     """An active GNU Lightning JIT state."""
@@ -46,12 +54,60 @@ class State(object):
             del self._functions
             self.lib._jit_destroy_state(self.state)
 
+    def _www(self, code, *args):
+        return Node(self.lib._jit_new_node_www(self.state, code, *args))
+
+    def _ww(self, code, *args):
+        return Node(self.lib._jit_new_node_ww(self.state, code, *args))
+
     def prolog(self):
         """Emits a function prologue."""
         self.lib._jit_prolog(self.state)
 
+    def arg(self):
+        return Node(self.lib._jit_arg(self.state))
+
+    def getarg(self, dst, src):
+        if Lightning.WORDSIZE == 64:
+            get = self.lib._jit_getarg_l
+        elif Lightning.WORDSIZE == 32:
+            get = self.lib._jit_getarg_i
+        else:
+            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+        return Node(get(self.state, dst, src.ptr))
+
     def movi(self, dst, src):
-        return self.lib._jit_new_node_ww(self.state, Code.movi, dst, src)
+        return self._ww(Code.movi, dst, src)
+
+    def addi(self, dst, src, integer):
+        return self._www(Code.addi, dst, src, integer)
+
+    def addr(self, dst, src1, src2):
+        return self._www(Code.addr, dst, src1, src2)
+
+    def mulr(self, dst, src1, src2):
+        return self._www(Code.mulr, dst, src1, src2)
+
+    def muli(self, dst, src, integer):
+        return self._www(Code.muli, dst, src, integer)
+
+    def str(self, dst, src):
+        if Lightning.WORDSIZE == 64:
+            code = Code.str_l
+        elif Lightning.WORDSIZE == 32:
+            code = Code.str_i
+        else:
+            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+        return self._ww(code, dst, src)
+
+    def ldr(self, dst, src):
+        if Lightning.WORDSIZE == 64:
+            code = Code.ldr_l
+        elif Lightning.WORDSIZE == 32:
+            code = Code.ldr_i
+        else:
+            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+        return self._ww(code, dst, src)
 
     def ret(self):
         self.lib._jit_ret(self.state)
@@ -68,7 +124,7 @@ class State(object):
         code_ptr = self.emit()
         func = make_func(code_ptr)
 
-        # Becase functions code are munmapped when we call _jit_destroy_state,
+        # Because functions code are munmapped when we call _jit_destroy_state,
         # we need to return weakrefs to the functions. Otherwise, a user could
         # call a function that points to invalid memory.
         self._functions.append(func)
@@ -77,6 +133,8 @@ class State(object):
 
 class Lightning(object):
     """The main GNU Lightning interface."""
+    WORDSIZE = 8*ctypes.sizeof(ctypes.c_int)
+
     def __init__(self, liblightning=None, program=None):
         """Bindings to GNU Lightning library.
 
@@ -126,11 +184,15 @@ class Lightning(object):
             func.restype = rettype
             func.argtypes = ptypes
 
+        sig(node_p, "_jit_arg", state_p)
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
+        sig(node_p, "_jit_new_node_www", state_p, code_t, word_t, word_t, word_t)
         sig(pointer_t, "_jit_emit", state_p)
         sig(state_p, "jit_new_state")
         sig(void, "_jit_clear_state", state_p)
         sig(void, "_jit_destroy_state", state_p)
+        sig(void, "_jit_getarg_i", state_p, gpr_t, node_p)
+        sig(void, "_jit_getarg_l", state_p, gpr_t, node_p)
         sig(void, "_jit_prolog", state_p)
         sig(void, "_jit_ret", state_p)
         sig(void, "_jit_retr", state_p, gpr_t)
