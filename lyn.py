@@ -14,6 +14,7 @@ import ctypes
 import ctypes.util
 import enum
 import sys
+import weakref
 
 # Lyn modules
 from codes import Code
@@ -52,27 +53,32 @@ class Register(enum.IntEnum):
     V2 = NativeRegister.R14
     V3 = NativeRegister.R15
 
+
 class State(object):
     """An active GNU Lightning JIT state."""
 
     def __init__(self, lib, state):
         self.lib = lib
         self.state = state
+        self._functions = []
+        self._destroyed = False
 
-    def _destroy(self):
-        self.lib._jit_destroy_state(self.state)
+    def clear(self):
+        self.lib._jit_clear_state(self.state)
 
-    def _finish(self):
-        self.lib.finish_jit(self.state)
+    def __del__(self):
+        self.destroy()
 
-    def release(self):
+    def destroy(self):
         """Destroys the state, along with its functions.
 
         After calling this, you cannot call compiled functions anymore: Doing
         so will result in crashing the entire process.
         """
-        self._destroy()
-        self._finish()
+        if not self._destroyed:
+            self._destroyed = True
+            del self._functions
+            self.lib._jit_destroy_state(self.state)
 
     def prolog(self):
         """Emits a function prologue."""
@@ -94,28 +100,33 @@ class State(object):
         """Compiles code and returns a Python-callable function."""
         make_func = ctypes.CFUNCTYPE(return_type)
         code_ptr = self.emit()
-        return make_func(code_ptr)
+        func = make_func(code_ptr)
+
+        # Becase functions code are munmapped when we call _jit_destroy_state,
+        # we need to return weakrefs to the functions. Otherwise, a user could
+        # call a function that points to invalid memory.
+        self._functions.append(func)
+        return weakref.proxy(func)
 
 
 class Lightning(object):
     """The main GNU Lightning interface."""
-
     def __init__(self, liblightning=None, program=None):
-        """Loads GNU Lightning library.
+        """Bindings to GNU Lightning library.
 
         Args:
             liblightning: Set to override path to liblightning.
             program: Set to override argument to init_jit, used with bfd.
         """
+        self._load(liblightning)
+        self._set_signatures()
+        self._init()
+        self._finished = False
+
+    def _load(self, liblightning=None):
         if liblightning is None:
             liblightning = ctypes.util.find_library("lightning")
         self.lib = ctypes.cdll.LoadLibrary(liblightning)
-
-        self._set_signatures()
-
-        if program is None:
-            program = sys.executable
-        self.lib.init_jit(program)
 
     def _set_signatures(self):
         """Sets return and parameter types for the foreign C functions."""
@@ -138,19 +149,36 @@ class Lightning(object):
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
         sig(pointer_t, "_jit_emit", state_p)
         sig(state_p, "jit_new_state")
+        sig(void, "_jit_clear_state", state_p)
         sig(void, "_jit_destroy_state", state_p)
         sig(void, "_jit_prolog", state_p)
         sig(void, "_jit_ret", state_p)
         sig(void, "_jit_retr", state_p, gpr_t)
-        sig(void, "finish_jit", state_p)
+        sig(void, "finish_jit")
         sig(void, "init_jit", ctypes.c_char_p)
 
-    def init(self, program=sys.executable):
+    def _init(self, program=None):
+        if program is None:
+            program = sys.executable
         self.lib.init_jit(program)
+
+    def __del__(self):
+        self.finish()
+
+    def finish(self):
+        if not self._finished:
+            self._finished = True
+            self.lib.finish_jit()
+
+    def new_state(self):
+        """Returns a new JIT state. You have to clean up by calling .destroy()
+        afterwards.
+        """
+        return State(self.lib, self.lib.jit_new_state())
 
     @contextlib.contextmanager
     def state(self):
         """Returns a new JIT state and cleans up afterwards."""
-        state = State(self.lib, self.lib.jit_new_state())
+        state = self.new_state()
         yield state
-        state.release()
+        state.destroy()
