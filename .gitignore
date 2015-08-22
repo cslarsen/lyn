@@ -1,1 +1,3 @@
 *.pyc
+.tox
+lyn.egg-info

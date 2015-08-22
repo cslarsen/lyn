@@ -48,10 +48,10 @@ class State(object):
     """An active GNU Lightning JIT state."""
 
     def __init__(self, lib, state):
+        self._destroyed = False
+        self._functions = []
         self.lib = lib
         self.state = state
-        self._functions = []
-        self._destroyed = False
 
     def clear(self):
         self.lib._jit_clear_state(self.state)
@@ -108,10 +108,10 @@ class Lightning(object):
             liblightning: Set to override path to liblightning.
             program: Set to override argument to init_jit, used with bfd.
         """
+        self._finished = False
         self._load(liblightning)
         self._set_signatures()
         self._init()
-        self._finished = False
 
     def _load(self, liblightning=None):
         if liblightning is None:
