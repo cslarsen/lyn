@@ -43,6 +43,17 @@ other hand, though, ctypes makes it possible to ship Lyn as a platform
 independent, pure Python source. I'll chew on this for a while, and we'll see
 what happens.
 
+Installation
+------------
+
+Either::
+
+    $ pip install lyn
+
+or::
+
+    $ python setup.py install
+
 Requirements
 ------------
 
