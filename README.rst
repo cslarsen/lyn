@@ -1,15 +1,12 @@
 lyn — Python bindings for GNU Lightning
 =======================================
 
-_Lyn_ provides Python bindings for GNU Lightning, the light-weight just-in-time
-compiler that translates RISC instructions to native machine code.
-
-The bindings are made through ``ctypes``, so all of the Lyn source code is in
-pure Python: All you need is liblightning.so/dylib/dll!
+Lyn provides Python bindings for GNU Lightning, the light-weight just-in-time
+(JIT) compiler that translated to native machine code.
 
 "Lyn" is the Norwegian word for "lightning".
 
-**NOTE:** This project is currently in extremely early stages (hours in!)
+**NOTE:** This project is currently in extremely early stages!
 
 Status
 ------
@@ -46,24 +43,13 @@ other hand, though, ctypes makes it possible to ship Lyn as a platform
 independent, pure Python source. I'll chew on this for a while, and we'll see
 what happens.
 
-
 Requirements
 ------------
 
-You need GNU Lightning. Lyn was made specifically for version 2.1.0, but may
-also work on later versions. It currently does not support earlier versions.
+You need GNU Lightning version 2.1.0, built as a shared library.
 
-To download and install GNU Lightning, see
-
-    http://www.gnu.org/software/lightning/
-
-Since Lyn loads Lightning using the ctypes foreign-function interface, you will
-most likely need to build a shared library. To do that, configure Lightning
-with ``--enable-shared``.
-
-If you want to be able to disassemble your compiled code, you also need GNU
-Binutils, along with a ``--enable-disassembler`` option to GNU Lightning's
-``configure``.  Consult its documentation for more information.
+Remember to configure GNU Lightning with the option ``--enable-shared``.  To
+use the disassembler, you should also add ``--enable-disassembler``.
 
 Author and license
 ------------------
