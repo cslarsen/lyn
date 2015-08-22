@@ -1,6 +1,7 @@
 from lyn import Register
 import ctypes
 import lyn
+import random
 import unittest
 
 class TestLyn(unittest.TestCase):
@@ -87,9 +88,17 @@ class TestLyn(unittest.TestCase):
             jit.getarg(Register.r0, num)
             jit.muli(Register.r0, Register.r0, 3)
             jit.retr(Register.r0)
-            incr = jit.emit_function(ctypes.c_int, [ctypes.c_int])
+
+            mul3 = jit.emit_function(ctypes.c_int, [ctypes.c_int])
+
             for n in range(100):
-                self.assertEqual(incr(n), n*3)
+                self.assertEqual(mul3(n), n*3)
+
+            # Test again with random numbers
+            bits = lyn.Lightning.WORDSIZE
+            for _ in range(1000):
+                n = random.randint(-2**(bits-1), 2**(bits-1)-1)
+                self.assertEqual(mul3(n), n*3)
 
     def test_sequential_states(self):
         with self.lyn.state() as a:
