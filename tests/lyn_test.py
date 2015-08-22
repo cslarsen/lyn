@@ -26,7 +26,7 @@ class TestLyn(unittest.TestCase):
     def test_single_instruction(self):
         with self.lyn.state() as jit:
             jit.prolog()
-            jit.movi(lyn.Register.V0, 123)
+            jit.movi(lyn.Register.v0, 123)
             code_ptr = jit.emit()
             self.assertIsNotNone(code_ptr)
 
@@ -34,9 +34,9 @@ class TestLyn(unittest.TestCase):
         with self.lyn.state() as jit:
             # Create a function that returns 123
             jit.prolog()
-            jit.movi(lyn.Register.V0, 123)
-            jit.movi(lyn.Register.V1, 456)
-            jit.retr(lyn.Register.V0)
+            jit.movi(lyn.Register.v0, 123)
+            jit.movi(lyn.Register.v1, 456)
+            jit.retr(lyn.Register.v0)
             code_ptr = jit.emit()
             self.assertIsNotNone(code_ptr)
 

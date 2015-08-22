@@ -22,29 +22,29 @@ In spite of this, I've managed to create a *really* simple program in Python
 that is JIT-compiled to native x86-64 machine code: A glorious function that
 returns the value of 123! Here's the code::
 
-    #!/usr/bin/env python
+    from lyn import Lightning, Register
 
-    from lyn import *
-
-    lib = Lightning()
-
-    with lib.state() as jit:
+    with Lightning().state() as jit:
         jit.prolog()
 
-        # The actual code
-        jit.movi(Register.V0, 123)
-        jit.retr(Register.V0)
+        # Actual code
+        jit.movi(Register.v0, 123)
+        jit.retr(Register.v0)
 
-        function = jit.emit_function()
-        print("Should get 123 here: %s" % function())
+        # Compile to native code and wrap in a Python-callable function
+        func = jit.emit_function()
+
+        print("Function returned %s and that is %s!" % (
+            func(), "correct" if func() == 123 else "incorrect"))
 
 I'm using ctypes for creating the bindings, which comes with some challenges:
 GNU Lightning is written in C, and relies heavily on compile-time macros that
-define machine specific opcodes, register values and so on. Because of this, it
-would be more natural to simply create bindings through a C extension. On the
-other hand, though, ctypes makes it possible to ship Lyn as a platform
-independent, pure Python source. I'll chew on this for a while, and we'll see
-what happens.
+define machine specific opcodes, register values and so on.
+
+Because of this, it would be more natural to simply create bindings through a C
+extension. On the other hand, though, ctypes makes it possible to ship Lyn as a
+platform independent, pure Python source. I'll chew on this for a while, and
+we'll see what happens.
 
 Installation
 ------------

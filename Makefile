@@ -5,6 +5,7 @@ default: test
 
 test:
 	$(PYTHON) setup.py test
+	PYTHONPATH=. $(PYTHON) examples/return-123.py
 
 check: test
 

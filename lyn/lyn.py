@@ -16,32 +16,8 @@ import enum
 import sys
 import weakref
 
-# Lyn modules
 from .codes import Code
-
-
-class NativeRegister(enum.IntEnum):
-    # TODO: These values are currently specific for x86-64.
-    RAX = 0
-    R10 = 1
-    R11 = 2
-    R12 = 3
-    RBX = 4
-    R13 = 5
-    R14 = 6
-    R15 = 7
-
-
-class Register(enum.IntEnum):
-    R0 = NativeRegister.RAX
-    R1 = NativeRegister.R10
-    R2 = NativeRegister.R11
-    R3 = NativeRegister.R12
-
-    V0 = NativeRegister.RBX
-    V1 = NativeRegister.R13
-    V2 = NativeRegister.R14
-    V3 = NativeRegister.R15
+from .registers import Register
 
 
 class State(object):
