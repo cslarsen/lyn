@@ -17,17 +17,7 @@ import sys
 import weakref
 
 # Lyn modules
-from codes import Code
-
-__author__ = "Christian Stigen Larsen"
-__copyright__ = "Copyright 2015, Christian Stigen Larsen"
-__credits__ = ["Christian Stigen Larsen"]
-
-__license__ = "LGPL"
-__version__ = "0.0.1"
-__maintainer__ = "Christian Stigen Larsen"
-__email__ = "csl@csl.name"
-__status__ = "Prototype"
+from .codes import Code
 
 
 class NativeRegister(enum.IntEnum):
@@ -128,6 +118,20 @@ class Lightning(object):
             liblightning = ctypes.util.find_library("lightning")
         self.lib = ctypes.cdll.LoadLibrary(liblightning)
 
+    def _init(self, program=None):
+        if program is None:
+            program = sys.executable
+        self.lib.init_jit(program)
+
+    def __del__(self):
+        self._finish()
+
+    def _finish(self):
+        if not self._finished:
+            self._finished = True
+            self.lib.finish_jit()
+            del self.lib
+
     def _set_signatures(self):
         """Sets return and parameter types for the foreign C functions."""
 
@@ -157,24 +161,11 @@ class Lightning(object):
         sig(void, "finish_jit")
         sig(void, "init_jit", ctypes.c_char_p)
 
-    def _init(self, program=None):
-        if program is None:
-            program = sys.executable
-        self.lib.init_jit(program)
-
-    def __del__(self):
-        self.finish()
-
-    def finish(self):
-        if not self._finished:
-            self._finished = True
-            self.lib.finish_jit()
-
     def new_state(self):
         """Returns a new JIT state. You have to clean up by calling .destroy()
         afterwards.
         """
-        return State(self.lib, self.lib.jit_new_state())
+        return State(weakref.proxy(self.lib), self.lib.jit_new_state())
 
     @contextlib.contextmanager
     def state(self):
