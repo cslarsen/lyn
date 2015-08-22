@@ -53,6 +53,7 @@ class TestLyn(unittest.TestCase):
 
         with self.lyn.state() as b:
             self.assertIsNotNone(a)
+            self.assertIsNotNone(b)
 
 if __name__ == "__main__":
     unittest.main()
