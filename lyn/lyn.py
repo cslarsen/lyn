@@ -13,6 +13,7 @@ import contextlib
 import ctypes
 import ctypes.util
 import enum
+import inspect
 import sys
 import weakref
 
@@ -32,6 +33,15 @@ class Pointer(object):
     """An internal pointer used by GNU Lightning (jit_pointer_t)."""
     def __init__(self, jit_pointer_t):
         self.ptr = jit_pointer_t
+
+    def __sub__(self, other):
+        return Pointer(self.ptr - other.ptr)
+
+    def __add__(self, other):
+        return Pointer(self.ptr - other.ptr)
+
+    def __int__(self):
+        return self.ptr
 
     def __repr__(self):
         return "<Pointer: jit_pointer_t to 0x%x>" % self.ptr
@@ -81,7 +91,7 @@ class State(object):
         self.lib._jit_epilog(self.state)
 
     def address(self, node):
-        return Node(self.lib._jit_address(self.state, node.ptr))
+        return Pointer(self.lib._jit_address(self.state, node.ptr))
 
     def arg(self):
         return Node(self.lib._jit_arg(self.state))
@@ -100,8 +110,10 @@ class State(object):
         assert(Lightning.wordsize == 64)
         return Node(self.lib._jit_getarg_l(self.state, register, node.ptr))
 
-    def note(self, name="", line=0):
-        return Node(self.lib._jit_note(name, line))
+    def note(self, name=None, line=None):
+        if line is None:
+            line = inspect.currentframe().f_back.f_lineno
+        return Node(self.lib._jit_note(self.state, name, line))
 
     def movi(self, register, immediate):
         return self._ww(Code.movi, register, immediate)
@@ -237,7 +249,7 @@ class Lightning(object):
         sig(node_p, "_jit_arg", state_p)
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
         sig(node_p, "_jit_new_node_www", state_p, code_t, word_t, word_t, word_t)
-        sig(node_p, "_jit_note", ctypes.c_char_p, ctypes.c_int)
+        sig(node_p, "_jit_note", state_p, ctypes.c_char_p, ctypes.c_int)
         sig(pointer_t, "_jit_address", state_p, node_p)
         sig(pointer_t, "_jit_emit", state_p)
         sig(state_p, "jit_new_state")
