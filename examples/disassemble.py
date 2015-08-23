@@ -59,7 +59,10 @@ codebuf = ctypes.create_string_buffer(length)
 ctypes.memmove(codebuf, ctypes.c_char_p(incr.address.ptr), length)
 print("Compiled %d bytes starting at 0x%x" % (length, incr.address))
 
+def hexbytes(b):
+    return "".join(map(lambda x: hex(x)[2:] + " ", b))
+
 # Capstone is smart enough to stop at the first RET-like instruction.
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
 for i in md.disasm(codebuf, incr.address.ptr):
-    print("0x%x %s %s" % (i.address, i.mnemonic, i.op_str))
+    print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
