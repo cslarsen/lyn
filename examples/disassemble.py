@@ -9,6 +9,20 @@ Then we disassemble the function using Capstone. Sweet!
 Note that we explicitly disassemble the code as x86-64. If you're on a
 different architecture, just pass different arguments to capstone.Cs.
 
+Example output:
+
+    ompiled 34 bytes starting at 0x103b43000
+    0x103b43000 sub rsp, 0x30
+    0x103b43004 mov qword ptr [rsp], rbp
+    0x103b43008 mov rbp, rsp
+    0x103b4300b sub rsp, 0x18
+    0x103b4300f mov rax, rdi
+    0x103b43012 add rax, 1
+    0x103b43016 mov rsp, rbp
+    0x103b43019 mov rbp, qword ptr [rsp]
+    0x103b4301d add rsp, 0x30
+    0x103b43021 ret
+
 2015-08-23 Christian Stigen Larsen
 """
 
