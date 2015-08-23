@@ -180,15 +180,14 @@ class Lightning(object):
     """The main GNU Lightning interface."""
     wordsize = 8*ctypes.sizeof(ctypes.c_void_p)
 
-    @staticmethod
-    def word_t():
-        if Lightning.wordsize == 64:
-            return ctypes.c_int64
-        elif Lightning.wordsize == 32:
-            return ctypes.c_int32
-        else:
-            raise NotSupportedError("Unsupported wordsize %d" %
-                    Lighting.wordsize)
+    # word_t property
+    if wordsize == 64:
+        word_t = ctypes.c_int64
+    elif wordsize == 32:
+        word_t = ctypes.c_int32
+    else:
+        raise NotSupportedError("Unsupported wordsize %d" %
+                Lighting.wordsize)
 
     def __init__(self, liblightning=None, program=None):
         """Bindings to GNU Lightning library.
@@ -232,14 +231,7 @@ class Lightning(object):
         pointer_t = ctypes.c_void_p
         state_p = ctypes.c_void_p
         void = None
-
-        if Lightning.wordsize == 32:
-            word_t = ctypes.c_int32
-        elif Lightning.wordsize == 64:
-            word_t = ctypes.c_int64
-        else:
-            raise NotSupportedError("Unsupported wordsize %d" %
-                    Lightning.wordsiez)
+        word_t = Lightning.word_t
 
         def sig(rettype, fname, *ptypes):
             func = getattr(self.lib, fname)

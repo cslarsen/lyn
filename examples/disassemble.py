@@ -23,6 +23,9 @@ Example output:
     0x103b4301d add rsp, 0x30
     0x103b43021 ret
 
+For this to work, you need the GNU Lightning shared library (liblightning.*) in
+the library search path. You also need Capstone, which you can get from PyPi.
+
 2015-08-23 Christian Stigen Larsen
 """
 
@@ -43,7 +46,8 @@ jit.retr(Register.r0)
 jit.epilog()
 end = jit.note()
 
-incr = jit.emit_function(lib.word_t(), [lib.word_t()])
+# Bind function to Python: returns a word (native integer), takes a word.
+incr = jit.emit_function(lib.word_t, [lib.word_t])
 
 # Sanity check
 assert(incr(1234) == 1235)

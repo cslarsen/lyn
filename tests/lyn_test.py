@@ -38,7 +38,7 @@ class TestLyn(unittest.TestCase):
             jit.movi(Register.v1, 22)
             jit.addi(Register.v2, Register.v1, 33)
             jit.retr(Register.v2)
-            f = jit.emit_function(Lightning.word_t())
+            f = jit.emit_function(Lightning.word_t)
             self.assertEqual(f(), 55)
 
     def test_addr(self):
@@ -48,7 +48,7 @@ class TestLyn(unittest.TestCase):
             jit.movi(Register.v2, 44)
             jit.addr(Register.v3, Register.v1, Register.v2)
             jit.retr(Register.v3)
-            f = jit.emit_function(Lightning.word_t())
+            f = jit.emit_function(Lightning.word_t)
             self.assertEqual(f(), 66)
 
     def test_execution(self):
@@ -77,7 +77,7 @@ class TestLyn(unittest.TestCase):
             jit.addi(Register.r0, Register.r0, 1)
             jit.retr(Register.r0)
 
-            incr = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+            incr = jit.emit_function(Lightning.word_t, [Lightning.word_t])
 
             for n in range(-100, 100):
                 self.assertEqual(incr(n), n+1)
@@ -94,7 +94,7 @@ class TestLyn(unittest.TestCase):
             jit.muli(Register.r0, Register.r0, 1)
             jit.retr(Register.r0)
 
-            mul1 = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+            mul1 = jit.emit_function(Lightning.word_t, [Lightning.word_t])
             bits = Lightning.wordsize
 
             for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
@@ -108,7 +108,7 @@ class TestLyn(unittest.TestCase):
             jit.muli(Register.r0, Register.r0, 3)
             jit.retr(Register.r0)
 
-            mul3 = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+            mul3 = jit.emit_function(Lightning.word_t, [Lightning.word_t])
 
             for n in range(-100, 100):
                 self.assertEqual(mul3(n), n*3)
@@ -137,7 +137,7 @@ class TestLyn(unittest.TestCase):
                 jit.prolog()
                 jit.movi(Register.r0, number)
                 jit.retr(Register.r0)
-                func = jit.emit_function(Lightning.word_t(), [])
+                func = jit.emit_function(Lightning.word_t, [])
                 self.assertEqual(func(), number)
 
     def test_roundtrip_arg(self):
@@ -149,7 +149,7 @@ class TestLyn(unittest.TestCase):
             num = jit.arg()
             jit.getarg(Register.r0, num)
             jit.retr(Register.r0)
-            func = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+            func = jit.emit_function(Lightning.word_t, [Lightning.word_t])
 
             for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
                 self.assertEqual(func(n), n)
