@@ -76,7 +76,7 @@ class State(object):
     def arg(self):
         return Node(self.lib._jit_arg(self.state))
 
-    def getarg(self, dst, src):
+    def getarg(self, register, node):
         if Lightning.wordsize == 64:
             get = self.lib._jit_getarg_l
         elif Lightning.wordsize == 32:
@@ -84,13 +84,17 @@ class State(object):
         else:
             raise NotImplementedError("Unsupported wordsize %d" %
                     Lightning.wordsize)
-        return Node(get(self.state, dst, src.ptr))
+        return Node(get(self.state, register, node.ptr))
 
-    def movi(self, dst, src):
-        return self._ww(Code.movi, dst, src)
+    def getarg_l(self, register, node):
+        assert(Lightning.wordsize == 64)
+        return Node(self.lib._jit_getarg_l(self.state, register, node.ptr))
 
-    def addi(self, dst, src, integer):
-        return self._www(Code.addi, dst, src, integer)
+    def movi(self, register, immediate):
+        return self._ww(Code.movi, register, immediate)
+
+    def addi(self, dst, src, immediate):
+        return self._www(Code.addi, dst, src, immediate)
 
     def addr(self, dst, src1, src2):
         return self._www(Code.addr, dst, src1, src2)
@@ -98,8 +102,8 @@ class State(object):
     def mulr(self, dst, src1, src2):
         return self._www(Code.mulr, dst, src1, src2)
 
-    def muli(self, dst, src, integer):
-        return self._www(Code.muli, dst, src, integer)
+    def muli(self, dst, src, immediate):
+        return self._www(Code.muli, dst, src, immediate)
 
     def str(self, dst, src):
         if Lightning.wordsize == 64:
