@@ -73,6 +73,16 @@ class State(object):
         """Emits a function prologue."""
         self.lib._jit_prolog(self.state)
 
+    def epilog(self):
+        """Emits a function epilogue.
+
+        Calling this function is optional.
+        """
+        self.lib._jit_epilog(self.state)
+
+    def address(self, node):
+        return Node(self.lib._jit_address(self.state, node.ptr))
+
     def arg(self):
         return Node(self.lib._jit_arg(self.state))
 
@@ -89,6 +99,9 @@ class State(object):
     def getarg_l(self, register, node):
         assert(Lightning.wordsize == 64)
         return Node(self.lib._jit_getarg_l(self.state, register, node.ptr))
+
+    def note(self, name="", line=0):
+        return Node(self.lib._jit_note(name, line))
 
     def movi(self, register, immediate):
         return self._ww(Code.movi, register, immediate)
@@ -224,10 +237,13 @@ class Lightning(object):
         sig(node_p, "_jit_arg", state_p)
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
         sig(node_p, "_jit_new_node_www", state_p, code_t, word_t, word_t, word_t)
+        sig(node_p, "_jit_note", ctypes.c_char_p, ctypes.c_int)
+        sig(pointer_t, "_jit_address", state_p, node_p)
         sig(pointer_t, "_jit_emit", state_p)
         sig(state_p, "jit_new_state")
         sig(void, "_jit_clear_state", state_p)
         sig(void, "_jit_destroy_state", state_p)
+        sig(void, "_jit_epilog", state_p)
         sig(void, "_jit_getarg_i", state_p, gpr_t, node_p)
         sig(void, "_jit_getarg_l", state_p, gpr_t, node_p)
         sig(void, "_jit_prolog", state_p)
