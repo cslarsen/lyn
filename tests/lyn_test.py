@@ -77,9 +77,29 @@ class TestLyn(unittest.TestCase):
             jit.getarg(Register.r0, num)
             jit.addi(Register.r0, Register.r0, 1)
             jit.retr(Register.r0)
+
             incr = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
-            for n in range(100):
+
+            for n in range(-100, 100):
                 self.assertEqual(incr(n), n+1)
+
+            if Lightning.wordsize == 64:
+                self.assertEqual(incr(9223372036854775806), 9223372036854775807)
+                self.assertEqual(incr(9223372036854775807), -9223372036854775808)
+
+    def test_roundtrip_mul(self):
+        with self.lyn.state() as jit:
+            jit.prolog()
+            n = jit.arg()
+            jit.getarg(Register.r0, n)
+            jit.muli(Register.r0, Register.r0, 1)
+            jit.retr(Register.r0)
+
+            mul1 = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+            bits = Lightning.wordsize
+
+            for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+                self.assertEqual(mul1(n), n)
 
     def test_mul3(self):
         """Creates a function that multiplies integers with three."""
@@ -92,20 +112,25 @@ class TestLyn(unittest.TestCase):
 
             mul3 = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
 
-            for n in range(100):
+            for n in range(-100, 100):
                 self.assertEqual(mul3(n), n*3)
 
             # Test again with random numbers
             bits = Lightning.wordsize
             min = -2**(bits-1)
             max = 2**(bits-1)-1
+
+            if bits == 64:
+                self.assertEqual(mul3(min//3), (min//3)*3)
+                self.assertEqual(mul3(max//3), (max//3)*3)
+
             for _ in range(1000):
                 n = random.randint(min//3, max//3)
                 self.assertEqual(mul3(n), n*3,
                     "For n=%d expected mul3 ==> %d but got %d (range %d to %d)" % (
                         n, n*3, mul3(n), min//3, max/73))
 
-    def test_ctype_number_return(self):
+    def test_roundtrip(self):
         """Tests that numbers returned from functions work."""
         jit = self.lyn.new_state()
         bits = self.lyn.wordsize
