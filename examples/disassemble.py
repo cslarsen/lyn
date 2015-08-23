@@ -66,3 +66,6 @@ def hexbytes(b):
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
 for i in md.disasm(codebuf, incr.address.ptr):
     print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
+
+raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))
+print("\nRaw bytes: %s" % raw)
