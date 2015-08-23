@@ -121,7 +121,7 @@ class State(object):
     def emit(self):
         return self.lib._jit_emit(self.state)
 
-    def emit_function(self, return_type=ctypes.c_int, *argtypes):
+    def emit_function(self, return_type=None, *argtypes):
         """Compiles code and returns a Python-callable function."""
         make_func = ctypes.CFUNCTYPE(return_type)
         code_ptr = self.emit()
@@ -137,6 +137,16 @@ class State(object):
 class Lightning(object):
     """The main GNU Lightning interface."""
     wordsize = 8*ctypes.sizeof(ctypes.c_void_p)
+
+    @staticmethod
+    def word_t():
+        if Lightning.wordsize == 64:
+            return ctypes.c_int64
+        elif Lightning.wordsize == 32:
+            return ctypes.c_int32
+        else:
+            raise NotSupportedError("Unsupported wordsize %d" %
+                    Lighting.wordsize)
 
     def __init__(self, liblightning=None, program=None):
         """Bindings to GNU Lightning library.

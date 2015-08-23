@@ -1,4 +1,4 @@
-from lyn import Register
+from lyn import Register, Lightning
 import ctypes
 import lyn
 import random
@@ -6,7 +6,7 @@ import unittest
 
 class TestLyn(unittest.TestCase):
     def setUp(self):
-        self.lyn = lyn.Lightning()
+        self.lyn = Lightning()
 
     def test_nested_states(self):
         with self.lyn.state() as a:
@@ -38,7 +38,7 @@ class TestLyn(unittest.TestCase):
             jit.movi(Register.v1, 22)
             jit.addi(Register.v2, Register.v1, 33)
             jit.retr(Register.v2)
-            f = jit.emit_function()
+            f = jit.emit_function(Lightning.word_t())
             self.assertEqual(f(), 55)
 
     def test_addr(self):
@@ -48,7 +48,7 @@ class TestLyn(unittest.TestCase):
             jit.movi(Register.v2, 44)
             jit.addr(Register.v3, Register.v1, Register.v2)
             jit.retr(Register.v3)
-            f = jit.emit_function()
+            f = jit.emit_function(Lightning.word_t())
             self.assertEqual(f(), 66)
 
     def test_execution(self):
@@ -76,7 +76,7 @@ class TestLyn(unittest.TestCase):
             jit.getarg(Register.r0, num)
             jit.addi(Register.r0, Register.r0, 1)
             jit.retr(Register.r0)
-            incr = jit.emit_function(ctypes.c_int, [ctypes.c_int])
+            incr = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
             for n in range(100):
                 self.assertEqual(incr(n), n+1)
 
@@ -89,28 +89,32 @@ class TestLyn(unittest.TestCase):
             jit.muli(Register.r0, Register.r0, 3)
             jit.retr(Register.r0)
 
-            mul3 = jit.emit_function(ctypes.c_int, [ctypes.c_int])
+            mul3 = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
 
             for n in range(100):
                 self.assertEqual(mul3(n), n*3)
 
             # Test again with random numbers
-            bits = lyn.Lightning.wordsize
+            bits = Lightning.wordsize
+            min = -2**(bits-1)
+            max = 2**(bits-1)-1
             for _ in range(1000):
-                n = random.randint(-2**(bits-1), 2**(bits-1)-1)
-                self.assertEqual(mul3(n), n*3)
+                n = random.randint(min//3, max//3)
+                self.assertEqual(mul3(n), n*3,
+                    "For n=%d expected mul3 ==> %d but got %d (range %d to %d)" % (
+                        n, n*3, mul3(n), min//3, max/73))
 
     def test_ctype_number_return(self):
         """Tests that numbers returned from functions work."""
         jit = self.lyn.new_state()
         bits = self.lyn.wordsize
 
-        for number in [0, 2**(bits-2), 2**(bits-1)-1, -2**(bits-1)-1]:
+        for number in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
             with self.lyn.state() as jit:
                 jit.prolog()
                 jit.movi(Register.r0, number)
                 jit.retr(Register.r0)
-                func = jit.emit_function(ctypes.c_int, [])
+                func = jit.emit_function(Lightning.word_t(), [])
                 self.assertEqual(func(), number)
 
     def test_sequential_states(self):
