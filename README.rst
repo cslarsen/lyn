@@ -5,7 +5,8 @@ Lyn provides Python bindings for GNU Lightning, the light-weight just-in-time
 (JIT) compiler that translates to native machine code.
 
 The code is hosted on https://github.com/cslarsen/lyn/ and is installable from
-https://pypi.python.org/pypi/lyn/.
+https://pypi.python.org/pypi/lyn/ (although I currently don't update PyPi quite
+often).
 
 "Lyn" is the Norwegian word for "lightning".
 
