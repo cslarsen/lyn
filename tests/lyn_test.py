@@ -70,7 +70,6 @@ class TestLyn(unittest.TestCase):
             self.assertEqual(result, 123)
 
     def test_incr(self):
-        """Creates a function that increments an integer."""
         with self.lyn.state() as jit:
             jit.prolog()
             num = jit.arg()
@@ -102,7 +101,6 @@ class TestLyn(unittest.TestCase):
                 self.assertEqual(mul1(n), n)
 
     def test_mul3(self):
-        """Creates a function that multiplies integers with three."""
         with self.lyn.state() as jit:
             jit.prolog()
             num = jit.arg()
@@ -130,8 +128,7 @@ class TestLyn(unittest.TestCase):
                     "For n=%d expected mul3 ==> %d but got %d (range %d to %d)" % (
                         n, n*3, mul3(n), min//3, max/73))
 
-    def test_roundtrip(self):
-        """Tests that numbers returned from functions work."""
+    def test_roundtrip_static(self):
         jit = self.lyn.new_state()
         bits = self.lyn.wordsize
 
@@ -142,6 +139,20 @@ class TestLyn(unittest.TestCase):
                 jit.retr(Register.r0)
                 func = jit.emit_function(Lightning.word_t(), [])
                 self.assertEqual(func(), number)
+
+    def test_roundtrip_arg(self):
+        jit = self.lyn.new_state()
+        bits = self.lyn.wordsize
+
+        with self.lyn.state() as jit:
+            jit.prolog()
+            num = jit.arg()
+            jit.getarg(Register.r0, num)
+            jit.retr(Register.r0)
+            func = jit.emit_function(Lightning.word_t(), [Lightning.word_t()])
+
+            for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+                self.assertEqual(func(n), n)
 
     def test_sequential_states(self):
         with self.lyn.state() as a:
