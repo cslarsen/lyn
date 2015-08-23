@@ -28,6 +28,15 @@ class Node(object):
         return "<Node: jit_node_t at 0x%x>" % self.ptr
 
 
+class Pointer(object):
+    """An internal pointer used by GNU Lightning (jit_pointer_t)."""
+    def __init__(self, jit_pointer_t):
+        self.ptr = jit_pointer_t
+
+    def __repr__(self):
+        return "<Pointer: jit_pointer_t to 0x%x>" % self.ptr
+
+
 class State(object):
     """An active GNU Lightning JIT state."""
 
@@ -119,13 +128,13 @@ class State(object):
         self.lib._jit_retr(self.state, src)
 
     def emit(self):
-        return self.lib._jit_emit(self.state)
+        return Pointer(self.lib._jit_emit(self.state))
 
     def emit_function(self, return_type=None, *argtypes):
         """Compiles code and returns a Python-callable function."""
         make_func = ctypes.CFUNCTYPE(return_type)
-        code_ptr = self.emit()
-        func = make_func(code_ptr)
+        code = self.emit()
+        func = make_func(code.ptr)
 
         # Because functions code are munmapped when we call _jit_destroy_state,
         # we need to return weakrefs to the functions. Otherwise, a user could
