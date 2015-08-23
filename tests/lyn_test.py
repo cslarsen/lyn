@@ -95,10 +95,23 @@ class TestLyn(unittest.TestCase):
                 self.assertEqual(mul3(n), n*3)
 
             # Test again with random numbers
-            bits = lyn.Lightning.WORDSIZE
+            bits = lyn.Lightning.wordsize
             for _ in range(1000):
                 n = random.randint(-2**(bits-1), 2**(bits-1)-1)
                 self.assertEqual(mul3(n), n*3)
+
+    def test_ctype_number_return(self):
+        """Tests that numbers returned from functions work."""
+        jit = self.lyn.new_state()
+        bits = self.lyn.wordsize
+
+        for number in [0, 2**(bits-2), 2**(bits-1)-1, -2**(bits-1)-1]:
+            with self.lyn.state() as jit:
+                jit.prolog()
+                jit.movi(Register.r0, number)
+                jit.retr(Register.r0)
+                func = jit.emit_function(ctypes.c_int, [])
+                self.assertEqual(func(), number)
 
     def test_sequential_states(self):
         with self.lyn.state() as a:

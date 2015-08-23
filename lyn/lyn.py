@@ -68,12 +68,13 @@ class State(object):
         return Node(self.lib._jit_arg(self.state))
 
     def getarg(self, dst, src):
-        if Lightning.WORDSIZE == 64:
+        if Lightning.wordsize == 64:
             get = self.lib._jit_getarg_l
-        elif Lightning.WORDSIZE == 32:
+        elif Lightning.wordsize == 32:
             get = self.lib._jit_getarg_i
         else:
-            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+            raise NotImplementedError("Unsupported wordsize %d" %
+                    Lightning.wordsize)
         return Node(get(self.state, dst, src.ptr))
 
     def movi(self, dst, src):
@@ -92,21 +93,23 @@ class State(object):
         return self._www(Code.muli, dst, src, integer)
 
     def str(self, dst, src):
-        if Lightning.WORDSIZE == 64:
+        if Lightning.wordsize == 64:
             code = Code.str_l
-        elif Lightning.WORDSIZE == 32:
+        elif Lightning.wordsize == 32:
             code = Code.str_i
         else:
-            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+            raise NotImplementedError("Unsupported wordsize %d" %
+                    Lightning.wordsize)
         return self._ww(code, dst, src)
 
     def ldr(self, dst, src):
-        if Lightning.WORDSIZE == 64:
+        if Lightning.wordsize == 64:
             code = Code.ldr_l
-        elif Lightning.WORDSIZE == 32:
+        elif Lightning.wordsize == 32:
             code = Code.ldr_i
         else:
-            raise NotImplementedError("Unsupported wordsize %d" % Lightning.WORDSIZE)
+            raise NotImplementedError("Unsupported wordsize %d" %
+                    Lightning.wordsize)
         return self._ww(code, dst, src)
 
     def ret(self):
@@ -133,7 +136,7 @@ class State(object):
 
 class Lightning(object):
     """The main GNU Lightning interface."""
-    WORDSIZE = 8*ctypes.sizeof(ctypes.c_int)
+    wordsize = 8*ctypes.sizeof(ctypes.c_void_p)
 
     def __init__(self, liblightning=None, program=None):
         """Bindings to GNU Lightning library.
@@ -171,13 +174,20 @@ class Lightning(object):
 
         # We currently pass structs as void pointers, and void returns are set
         # to None (TODO: Find out if None means void for ctypes)
-        code_t = ctypes.c_int # It's an enum in lightning.h
+        code_t = ctypes.c_int
         gpr_t = ctypes.c_int32
         node_p = ctypes.c_void_p
         pointer_t = ctypes.c_void_p
         state_p = ctypes.c_void_p
         void = None
-        word_t = ctypes.c_int # NOTE: size should equal sizeof(void*)
+
+        if Lightning.wordsize == 32:
+            word_t = ctypes.c_int32
+        elif Lightning.wordsize == 64:
+            word_t = ctypes.c_int64
+        else:
+            raise NotSupportedError("Unsupported wordsize %d" %
+                    Lightning.wordsiez)
 
         def sig(rettype, fname, *ptypes):
             func = getattr(self.lib, fname)
