@@ -140,6 +140,10 @@ class State(object):
         code = self.emit()
         func = make_func(code.ptr)
 
+        # Save this in case anyone wants to disassemble using external
+        # libraries
+        func.code = code
+
         # Because functions code are munmapped when we call _jit_destroy_state,
         # we need to return weakrefs to the functions. Otherwise, a user could
         # call a function that points to invalid memory.
