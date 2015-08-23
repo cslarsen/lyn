@@ -56,9 +56,9 @@ assert(incr(1234) == 1235)
 
 # This part should be obvious to C programmers: We need to read data from raw
 # memory in to a Python iterable.
-length = (jit.address(end) - jit.address(start)).ptr
+length = (jit.address(end) - jit.address(start)).value
 codebuf = ctypes.create_string_buffer(length)
-ctypes.memmove(codebuf, ctypes.c_char_p(incr.address.ptr), length)
+ctypes.memmove(codebuf, ctypes.c_char_p(incr.address.value), length)
 print("Compiled %d bytes starting at 0x%x" % (length, incr.address))
 
 def hexbytes(b):
@@ -67,7 +67,7 @@ def hexbytes(b):
 # Capstone is smart enough to stop at the first RET-like instruction.
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
 md.syntax = capstone.CS_OPT_SYNTAX_ATT # Change to Intel syntax if you want
-for i in md.disasm(codebuf, incr.address.ptr):
+for i in md.disasm(codebuf, incr.address.value):
     print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
 
 raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))

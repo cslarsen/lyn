@@ -8,7 +8,7 @@ with Lightning().state() as jit:
     jit.retr(Register.v0)
 
     # Compile to native code and wrap in a Python-callable function
-    func = jit.emit_function()
+    func = jit.emit_function(Lightning.word_t)
 
     print("Function returned %s and that is %s!" % (
         func(), "correct" if func() == 123 else "incorrect"))

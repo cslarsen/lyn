@@ -60,10 +60,10 @@ class TestLyn(unittest.TestCase):
             jit.retr(Register.v0)
             code = jit.emit()
             self.assertIsNotNone(code)
-            self.assertIsNotNone(code.ptr)
+            self.assertIsNotNone(code.value)
 
             make_func = ctypes.CFUNCTYPE(ctypes.c_int)
-            func = make_func(code.ptr)
+            func = make_func(code.value)
             result = func()
             self.assertTrue(result is not None)
             self.assertIsInstance(result, int)

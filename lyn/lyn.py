@@ -23,28 +23,28 @@ from .registers import Register
 class Node(object):
     """A node in the code (jit_node_t pointer)."""
     def __init__(self, jit_node_ptr):
-        self.ptr = jit_node_ptr
+        self.value = jit_node_ptr
 
     def __repr__(self):
-        return "<Node: jit_node_t at 0x%x>" % self.ptr
+        return "<Node: jit_node_t at 0x%x>" % self.value
 
 
 class Pointer(object):
     """An internal pointer used by GNU Lightning (jit_pointer_t)."""
     def __init__(self, jit_pointer_t):
-        self.ptr = jit_pointer_t
+        self.value = jit_pointer_t
 
     def __sub__(self, other):
-        return Pointer(self.ptr - other.ptr)
+        return Pointer(self.value - other.value)
 
     def __add__(self, other):
-        return Pointer(self.ptr - other.ptr)
+        return Pointer(self.value - other.value)
 
     def __int__(self):
-        return self.ptr
+        return self.value
 
     def __repr__(self):
-        return "<Pointer: jit_pointer_t to 0x%x>" % self.ptr
+        return "<Pointer: jit_pointer_t to 0x%x>" % self.value
 
 
 class State(object):
@@ -91,7 +91,7 @@ class State(object):
         self.lib._jit_epilog(self.state)
 
     def address(self, node):
-        return Pointer(self.lib._jit_address(self.state, node.ptr))
+        return Pointer(self.lib._jit_address(self.state, node.value))
 
     def arg(self):
         return Node(self.lib._jit_arg(self.state))
@@ -104,11 +104,11 @@ class State(object):
         else:
             raise NotImplementedError("Unsupported wordsize %d" %
                     Lightning.wordsize)
-        return Node(get(self.state, register, node.ptr))
+        return Node(get(self.state, register, node.value))
 
     def getarg_l(self, register, node):
         assert(Lightning.wordsize == 64)
-        return Node(self.lib._jit_getarg_l(self.state, register, node.ptr))
+        return Node(self.lib._jit_getarg_l(self.state, register, node.value))
 
     def note(self, name=None, line=None):
         if line is None:
@@ -163,7 +163,7 @@ class State(object):
         """Compiles code and returns a Python-callable function."""
         make_func = ctypes.CFUNCTYPE(return_type)
         code = self.emit()
-        func = make_func(code.ptr)
+        func = make_func(code.value)
 
         # Save this in case anyone wants to disassemble using external
         # libraries
