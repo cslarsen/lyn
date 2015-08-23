@@ -11,17 +11,19 @@ different architecture, just pass different arguments to capstone.Cs.
 
 Example output:
 
-    Compiled 34 bytes starting at 0x10e7f7000
-    0x10e7f7000 48 83 ec 30    sub rsp, 0x30
-    0x10e7f7004 48 89 2c 24    mov qword ptr [rsp], rbp
-    0x10e7f7008 48 89 e5       mov rbp, rsp
-    0x10e7f700b 48 83 ec 18    sub rsp, 0x18
-    0x10e7f700f 48 89 f8       mov rax, rdi
-    0x10e7f7012 48 83 c0 1     add rax, 1
-    0x10e7f7016 48 89 ec       mov rsp, rbp
-    0x10e7f7019 48 8b 2c 24    mov rbp, qword ptr [rsp]
-    0x10e7f701d 48 83 c4 30    add rsp, 0x30
-    0x10e7f7021 c3             ret
+    Compiled 34 bytes starting at 0x10acf4000
+    0x10acf4000 48 83 ec 30    subq $0x30, %rsp
+    0x10acf4004 48 89 2c 24    movq %rbp, (%rsp)
+    0x10acf4008 48 89 e5       movq %rsp, %rbp
+    0x10acf400b 48 83 ec 18    subq $0x18, %rsp
+    0x10acf400f 48 89 f8       movq %rdi, %rax
+    0x10acf4012 48 83 c0 1     addq $1, %rax
+    0x10acf4016 48 89 ec       movq %rbp, %rsp
+    0x10acf4019 48 8b 2c 24    movq (%rsp), %rbp
+    0x10acf401d 48 83 c4 30    addq $0x30, %rsp
+    0x10acf4021 c3             retq
+
+    Raw bytes: \x48\x83\xec\x30\x48\x89\x2c\x24[...]
 
 For this to work, you need the GNU Lightning shared library (liblightning.*) in
 the library search path. You also need Capstone, which you can get from PyPi.
@@ -64,6 +66,7 @@ def hexbytes(b):
 
 # Capstone is smart enough to stop at the first RET-like instruction.
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
+md.syntax = capstone.CS_OPT_SYNTAX_ATT # Change to Intel syntax if you want
 for i in md.disasm(codebuf, incr.address.ptr):
     print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
 
