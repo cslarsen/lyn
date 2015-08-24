@@ -14,6 +14,11 @@ setup(
     zip_safe=True,
     test_suite="tests",
 
+    install_requires=[
+        "enum34",
+        "capstone",
+    ],
+
     keywords=["jit", "compilation", "bytecode", "assembly", "just-in-time",
         "compiler", "machine code", "native code", "speed"],
 

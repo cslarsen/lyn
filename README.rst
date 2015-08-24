@@ -124,10 +124,36 @@ or::
 Requirements
 ------------
 
-You need GNU Lightning version 2.1.0, built as a shared library.
+Python modules:
 
-Remember to configure GNU Lightning with the option ``--enable-shared``.  To
-use the disassembler, you should also add ``--enable-disassembler``.
+    * enum34: ``pip install enum34``
+    * capstone, if you want to run ``examples/disassemble.py``: ``pip install
+      capstone``
+
+System libraries:
+
+    * GNU Lightning v2.1.0 shared library
+    * Capstone, if you want to run ``examples/disassemble.py``
+
+You can download GNU Lightning from
+
+    http://www.gnu.org/software/lightning/
+
+I had problems building GNU Lightning from sources on Linux, because of
+problems linking with libopcodes. So this worked for me::
+
+    $ ./configure --enable-shared --disable-disassembler
+
+You can download Capstone from
+
+    http://www.capstone-engine.org
+
+You need GNU Lightning version 2.1.0, built as a shared library. After
+installing, if you can't instantiate Lyn, try setting the path yourself::
+
+    $ python
+    >>> import lyn
+    >>> lib = lyn.Lightning("/usr/local/lib/liblightning.so")
 
 Author and license
 ------------------
