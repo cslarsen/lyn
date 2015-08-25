@@ -124,50 +124,43 @@ or::
 Requirements
 ------------
 
-Python modules:
+You need the following C libraries:
 
-    * enum34: ``pip install enum34``
-    * capstone, if you want to run ``examples/disassemble.py``: ``pip install
-      capstone``
+    * GNU Lightning v2.1.0 shared library configured with ``--enable-shared``.
+      http://www.gnu.org/software/lightning/
 
-System libraries:
+    * Capstone shared library, if you want to run ``examples/disassemble.py``.
+      http://www.capstone-engine.org
 
-    * GNU Lightning v2.1.0 shared library
-    * Capstone, if you want to run ``examples/disassemble.py``
+The required Python modules should be automatically installed with ``python
+setup.py install``, but you can also install them manually:
 
-You can download GNU Lightning from
+    * capstone, if you want to run ``examples/disassemble.py`` (on PyPi)
+    * enum34 (and *not* the ``enum`` module that's on PyPi)
+    * six, for Python 3.x compatibility.
 
-    http://www.gnu.org/software/lightning/
-
-I had problems building GNU Lightning from sources on Linux, because of
-problems linking with libopcodes. So this worked for me::
+Note that I had problems building GNU Lightning on Linux, because it had
+problems linking with ``libopcodes``.  This worked for me::
 
     $ ./configure --enable-shared --disable-disassembler
 
-You can download Capstone from
+After installing these libraries, you have to make sure they are in the library search
+path.  If you can't instantiate a ``lyn.Lightning`` object, then you can try
+adding its containing path to ``LD_LIBRARY_PATH``::
 
-    http://www.capstone-engine.org
+    $ LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/path/containing/liblightning python
+    >>> import lyn
+    >>> lib = lyn.Lightning()
 
-You need GNU Lightning version 2.1.0, built as a shared library. After
-installing, if you can't instantiate Lyn, try setting the path yourself::
+... or you can set the path explicitly::
 
     $ python
     >>> import lyn
     >>> lib = lyn.Lightning("/usr/local/lib/liblightning.so")
 
-Errors
-------
+To test that Capstone is working, you can run the disassembly example::
 
-If Lyn can't find liblightning, you'll get an error like this::
-
-    OSError: liblightning.so.0: cannot open shared object file: No such file or
-    directory
-
-In that case, make sure that the library is in the system's search path. You
-can try setting that yourself by doing the following from the source directory::
-
-    $ cd lyn
-    $ LD_LIBRARY_PATH=/usr/lib PYTHONPATH=. python examples/disassemble.py
+    $ python examples/disassemble.py
 
 Author and license
 ------------------
