@@ -12,8 +12,8 @@ on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
 import contextlib
 import ctypes
 import ctypes.util
-import enum
 import inspect
+import six
 import sys
 import weakref
 
@@ -208,7 +208,7 @@ class Lightning(object):
     def _init(self, program=None):
         if program is None:
             program = sys.executable
-        self.lib.init_jit(program)
+        self.lib.init_jit(six.b(program))
 
     def __del__(self):
         self.release()

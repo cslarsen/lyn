@@ -16,6 +16,7 @@ setup(
 
     install_requires=[
         "enum34",
+        "six",
         "capstone",
     ],
 
