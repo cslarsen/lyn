@@ -13,6 +13,7 @@ from .lyn import (
     Lightning,
     Register,
     State,
+    char_p,
     word_t,
     wordsize,
 )
@@ -21,6 +22,7 @@ __all__ = [
     "Lightning",
     "Register",
     "State",
+    "char_p",
     "word_t",
     "wordsize",
 ]
