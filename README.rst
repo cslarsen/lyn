@@ -155,6 +155,20 @@ installing, if you can't instantiate Lyn, try setting the path yourself::
     >>> import lyn
     >>> lib = lyn.Lightning("/usr/local/lib/liblightning.so")
 
+Errors
+------
+
+If Lyn can't find liblightning, you'll get an error like this::
+
+    OSError: liblightning.so.0: cannot open shared object file: No such file or
+    directory
+
+In that case, make sure that the library is in the system's search path. You
+can try setting that yourself by doing the following from the source directory::
+
+    $ cd lyn
+    $ LD_LIBRARY_PATH=/usr/lib PYTHONPATH=. python examples/disassemble.py
+
 Author and license
 ------------------
 
