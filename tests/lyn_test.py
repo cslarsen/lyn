@@ -10,27 +10,27 @@ class TestLyn(unittest.TestCase):
 
     def test_nested_states(self):
         with self.lyn.state() as a:
-            self.assertIsNotNone(a)
+            self.assertFalse(a is None)
             with self.lyn.state() as b:
-                self.assertIsNotNone(b)
+                self.assertFalse(b is None)
                 self.assertNotEqual(a, b)
 
     def test_state(self):
         with self.lyn.state() as a:
-           self.assertIsNotNone(a)
+           self.assertFalse(a is None)
 
     def test_empty_code(self):
         with self.lyn.state() as jit:
             jit.prolog()
             code_ptr = jit.emit()
-            self.assertIsNotNone(code_ptr)
+            self.assertFalse(code_ptr is None)
 
     def test_single_instruction(self):
         with self.lyn.state() as jit:
             jit.prolog()
             jit.movi(Register.v0, 123)
             code_ptr = jit.emit()
-            self.assertIsNotNone(code_ptr)
+            self.assertFalse(code_ptr is None)
 
     def test_addi(self):
         with self.lyn.state() as jit:
@@ -59,14 +59,14 @@ class TestLyn(unittest.TestCase):
             jit.movi(Register.v1, 456)
             jit.retr(Register.v0)
             code = jit.emit()
-            self.assertIsNotNone(code)
-            self.assertIsNotNone(code.value)
+            self.assertFalse(code is None)
+            self.assertFalse(code.value is None)
 
             make_func = ctypes.CFUNCTYPE(ctypes.c_int)
             func = make_func(code.value)
             result = func()
             self.assertTrue(result is not None)
-            self.assertIsInstance(result, int)
+            self.assertTrue(isinstance(result, int))
             self.assertEqual(result, 123)
 
     def test_incr(self):
@@ -156,11 +156,11 @@ class TestLyn(unittest.TestCase):
 
     def test_sequential_states(self):
         with self.lyn.state() as a:
-            self.assertIsNotNone(a)
+            self.assertFalse(a is None)
 
         with self.lyn.state() as b:
-            self.assertIsNotNone(a)
-            self.assertIsNotNone(b)
+            self.assertFalse(a is None)
+            self.assertFalse(b is None)
 
 if __name__ == "__main__":
     unittest.main()
