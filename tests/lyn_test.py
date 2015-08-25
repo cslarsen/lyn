@@ -8,6 +8,9 @@ class TestLyn(unittest.TestCase):
     def setUp(self):
         self.lyn = Lightning()
 
+    def tearDown(self):
+        self.lyn.release()
+
     def test_nested_states(self):
         with self.lyn.state() as a:
             self.assertFalse(a is None)
@@ -129,30 +132,30 @@ class TestLyn(unittest.TestCase):
                         n, n*3, mul3(n), min//3, max/73))
 
     def test_roundtrip_static(self):
-        jit = self.lyn.new_state()
-        bits = self.lyn.wordsize
+        with self.lyn.state() as jit:
+            bits = self.lyn.wordsize
 
-        for number in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
-            with self.lyn.state() as jit:
-                jit.prolog()
-                jit.movi(Register.r0, number)
-                jit.retr(Register.r0)
-                func = jit.emit_function(Lightning.word_t, [])
-                self.assertEqual(func(), number)
+            for number in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+                with self.lyn.state() as jit:
+                    jit.prolog()
+                    jit.movi(Register.r0, number)
+                    jit.retr(Register.r0)
+                    func = jit.emit_function(Lightning.word_t, [])
+                    self.assertEqual(func(), number)
 
     def test_roundtrip_arg(self):
-        jit = self.lyn.new_state()
-        bits = self.lyn.wordsize
-
         with self.lyn.state() as jit:
-            jit.prolog()
-            num = jit.arg()
-            jit.getarg(Register.r0, num)
-            jit.retr(Register.r0)
-            func = jit.emit_function(Lightning.word_t, [Lightning.word_t])
+            bits = self.lyn.wordsize
 
-            for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
-                self.assertEqual(func(n), n)
+            with self.lyn.state() as jit:
+                jit.prolog()
+                num = jit.arg()
+                jit.getarg(Register.r0, num)
+                jit.retr(Register.r0)
+                func = jit.emit_function(Lightning.word_t, [Lightning.word_t])
+
+                for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+                    self.assertEqual(func(n), n)
 
     def test_sequential_states(self):
         with self.lyn.state() as a:

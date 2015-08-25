@@ -36,7 +36,7 @@ import capstone
 import ctypes
 
 lib = Lightning()
-jit = lib.new_state()
+jit = lib.state()
 
 # A function that returns one more than its integer input
 start = jit.note()
@@ -72,3 +72,6 @@ for i in md.disasm(codebuf, incr.address.value):
 
 raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))
 print("\nRaw bytes: %s" % raw)
+
+jit.release()
+lib.release()

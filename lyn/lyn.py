@@ -55,11 +55,14 @@ class State(object):
         self.lib = lib
         self.state = state
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.release()
+
     def clear(self):
         self.lib._jit_clear_state(self.state)
-
-    def __del__(self):
-        self.release()
 
     def release(self):
         """Destroys the state, along with its functions.
@@ -67,11 +70,9 @@ class State(object):
         After calling this, you cannot call compiled functions anymore: Doing
         so will result in crashing the entire process.
         """
-        if hasattr(self, "_functions"):
-            del self._functions
-        if hasattr(self, "lib"):
-            self.lib._jit_destroy_state(self.state)
-            del self.lib
+        del self._functions
+        self.lib._jit_destroy_state(self.state)
+        self.lib = None
 
     def _www(self, code, *args):
         return Node(self.lib._jit_new_node_www(self.state, code, *args))
@@ -226,13 +227,9 @@ class Lightning(object):
 
         self.lib.init_jit(program)
 
-    def __del__(self):
-        self.release()
-
     def release(self):
-        if hasattr(self, "lib"):
-            self.lib.finish_jit()
-            del self.lib
+        self.lib.finish_jit()
+        self.lib = None
 
     def _set_signatures(self):
         """Sets return and parameter types for the foreign C functions."""
@@ -270,15 +267,14 @@ class Lightning(object):
         sig(void, "finish_jit")
         sig(void, "init_jit", ctypes.c_char_p)
 
-    def new_state(self):
+    def state(self):
         """Returns a new JIT state. You have to clean up by calling .destroy()
         afterwards.
         """
         return State(weakref.proxy(self.lib), self.lib.jit_new_state())
 
-    @contextlib.contextmanager
-    def state(self):
-        """Returns a new JIT state and cleans up afterwards."""
-        state = self.new_state()
-        yield state
-        state.release()
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.release()
