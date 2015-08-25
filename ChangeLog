@@ -1,0 +1,5 @@
+New in v0.0.5
+- Adds new function types word_t and char_p, with automatic conversion.
+- Works on both Python 2 and 3.
+- Fixed argument types for functions made with emit_function.
+- Added tox testing.
