@@ -113,6 +113,10 @@ class State(object):
     def note(self, name=None, line=None):
         if line is None:
             line = inspect.currentframe().f_back.f_lineno
+
+        if not isinstance(name, bytes):
+            name = six.b(name)
+
         return Node(self.lib._jit_note(self.state, name, line))
 
     def movi(self, register, immediate):
@@ -208,7 +212,11 @@ class Lightning(object):
     def _init(self, program=None):
         if program is None:
             program = sys.executable
-        self.lib.init_jit(six.b(program))
+
+        if not isinstance(program, bytes):
+            program = six.b(program)
+
+        self.lib.init_jit(program)
 
     def __del__(self):
         self.release()
