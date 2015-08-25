@@ -1,12 +1,28 @@
 # -*- encoding: utf-8 -*-
 
 """
-lyn -- Bindings for GNU Lightning.
+lyn -- Python bindings for GNU Lightning.
 
-Copyright (C) 2015 Christian Stigen Larsen
+GNU lightning is a library that generates assembly language code at run-time;
+it is very fast, making it ideal for Just-In-Time compilers, and it abstracts
+over the target CPU, as it exposes to the clients a standardized RISC
+instruction set inspired by the MIPS and SPARC chips.
 
-Distributed under the LGPL v2.1 or later. You are allowed to change the license
-on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
+The above paragraph was taken from its site at
+http://www.gnu.org/software/lightning/
+
+GNU Lightning
+
+    Copyright (C) 2012, 2013  Free Software Foundation, Inc.
+    Distributed under the GPL v3.
+    Written by Paulo Cesar Pereira de Andrade
+
+Lyn
+
+    Copyright (C) 2015 Christian Stigen Larsen
+
+    Distributed under the LGPL 2.1 or later. You are allowed to change the
+    license on a particular copy to the LGPL 3.0, the GPL 2.0 or the GPL 3.0.
 """
 
 import contextlib
@@ -20,7 +36,7 @@ import weakref
 from .codes import Code
 from .registers import Register
 
-#: The bit size of Lightning words. Equal to sizeof(void*).
+#: The bit size of GNU Lightning words, equal to sizeof(void*).
 wordsize = ctypes.sizeof(ctypes.c_void_p) * 8
 
 #: The word type, used for parameter and return types in functions.
@@ -28,6 +44,22 @@ word_t = {64: ctypes.c_int64,
           32: ctypes.c_int32,
           16: ctypes.c_int16,
            8: ctypes.c_int8}.get(wordsize, ctypes.c_int)
+
+word_t.__name__ = "word_t"
+word_t.__doc__ = "Parameter type whose size equals sizeof(void*)."
+
+class char_p(ctypes.c_char_p):
+    """Drop-in replacement for ctypes.c_char_p that automatically converts
+    string arguments to bytes.
+
+    This is useful for Python 3, where you would have to explictly pass byte
+    strings when calling foreign functions, but also works for Python 2.
+    """
+    @classmethod
+    def from_param(cls, value):
+        if value is not None and not isinstance(value, bytes):
+            value = six.b(value)
+        return value
 
 
 class Node(object):
@@ -120,11 +152,9 @@ class State(object):
         return Node(self.lib._jit_getarg_i(self.state, register, node.value))
 
     def note(self, name=None, line=None):
+        # Get caller's line number
         if line is None:
             line = inspect.currentframe().f_back.f_lineno
-
-        if not name is None and not isinstance(name, bytes):
-            name = six.b(name)
 
         return Node(self.lib._jit_note(self.state, name, line))
 
@@ -216,9 +246,6 @@ class Lightning(object):
         if program is None:
             program = sys.executable
 
-        if not program is None and not isinstance(program, bytes):
-            program = six.b(program)
-
         self.lib.init_jit(program)
 
     def release(self):
@@ -244,7 +271,7 @@ class Lightning(object):
         sig(node_p, "_jit_arg", state_p)
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
         sig(node_p, "_jit_new_node_www", state_p, code_t, word_t, word_t, word_t)
-        sig(node_p, "_jit_note", state_p, ctypes.c_char_p, ctypes.c_int)
+        sig(node_p, "_jit_note", state_p, char_p, ctypes.c_int)
         sig(pointer_t, "_jit_address", state_p, node_p)
         sig(pointer_t, "_jit_emit", state_p)
         sig(state_p, "jit_new_state")
@@ -257,7 +284,7 @@ class Lightning(object):
         sig(void, "_jit_ret", state_p)
         sig(void, "_jit_retr", state_p, gpr_t)
         sig(void, "finish_jit")
-        sig(void, "init_jit", ctypes.c_char_p)
+        sig(void, "init_jit", char_p)
 
     def state(self):
         """Returns a new JIT state. You have to clean up by calling .destroy()
