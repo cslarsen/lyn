@@ -17,7 +17,7 @@ setup(
     install_requires=[
         "enum34",
         "six",
-        "capstone",
+        #"capstone", # TODO: Make this optional
     ],
 
     keywords=["jit", "compilation", "bytecode", "assembly", "just-in-time",
