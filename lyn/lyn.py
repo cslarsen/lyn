@@ -114,7 +114,7 @@ class State(object):
         if line is None:
             line = inspect.currentframe().f_back.f_lineno
 
-        if not isinstance(name, bytes):
+        if not name is None and not isinstance(name, bytes):
             name = six.b(name)
 
         return Node(self.lib._jit_note(self.state, name, line))
@@ -180,6 +180,14 @@ class State(object):
         return weakref.proxy(func)
 
 
+class Int64(ctypes.c_int64):
+    @classmethod
+    def from_param(cls, value):
+        if not isinstance(value, ctypes.c_int64):
+            value = ctypes.c_int64(value)
+        return value
+
+
 class Lightning(object):
     """The main GNU Lightning interface."""
     wordsize = 8*ctypes.sizeof(ctypes.c_void_p)
@@ -213,7 +221,7 @@ class Lightning(object):
         if program is None:
             program = sys.executable
 
-        if not isinstance(program, bytes):
+        if not program is None and not isinstance(program, bytes):
             program = six.b(program)
 
         self.lib.init_jit(program)
