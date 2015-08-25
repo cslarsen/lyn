@@ -51,7 +51,6 @@ class State(object):
     """An active GNU Lightning JIT state."""
 
     def __init__(self, lib, state):
-        self._destroyed = False
         self._functions = []
         self.lib = lib
         self.state = state
@@ -60,18 +59,19 @@ class State(object):
         self.lib._jit_clear_state(self.state)
 
     def __del__(self):
-        self.destroy()
+        self.release()
 
-    def destroy(self):
+    def release(self):
         """Destroys the state, along with its functions.
 
         After calling this, you cannot call compiled functions anymore: Doing
         so will result in crashing the entire process.
         """
-        if not self._destroyed:
-            self._destroyed = True
+        if hasattr(self, "_functions"):
             del self._functions
+        if hasattr(self, "lib"):
             self.lib._jit_destroy_state(self.state)
+            del self.lib
 
     def _www(self, code, *args):
         return Node(self.lib._jit_new_node_www(self.state, code, *args))
@@ -196,7 +196,6 @@ class Lightning(object):
             liblightning: Set to override path to liblightning.
             program: Set to override argument to init_jit, used with bfd.
         """
-        self._finished = False
         self._load(liblightning)
         self._set_signatures()
         self._init()
@@ -212,11 +211,10 @@ class Lightning(object):
         self.lib.init_jit(program)
 
     def __del__(self):
-        self._finish()
+        self.release()
 
-    def _finish(self):
-        if not self._finished:
-            self._finished = True
+    def release(self):
+        if hasattr(self, "lib"):
             self.lib.finish_jit()
             del self.lib
 
@@ -267,4 +265,4 @@ class Lightning(object):
         """Returns a new JIT state and cleans up afterwards."""
         state = self.new_state()
         yield state
-        state.destroy()
+        state.release()
