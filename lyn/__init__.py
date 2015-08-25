@@ -13,12 +13,16 @@ from .lyn import (
     Lightning,
     Register,
     State,
+    word_t,
+    wordsize,
 )
 
 __all__ = [
     "Lightning",
     "Register",
     "State",
+    "word_t",
+    "wordsize",
 ]
 
 __author__ = "Christian Stigen Larsen"

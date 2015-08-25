@@ -49,7 +49,7 @@ jit.epilog()
 end = jit.note()
 
 # Bind function to Python: returns a word (native integer), takes a word.
-incr = jit.emit_function(lib.word_t, [lib.word_t])
+incr = jit.emit_function(word_t, [word_t])
 
 # Sanity check
 assert(incr(1234) == 1235)

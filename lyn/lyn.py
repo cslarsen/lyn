@@ -20,6 +20,16 @@ import weakref
 from .codes import Code
 from .registers import Register
 
+#: The bit size of Lightning words. Equal to sizeof(void*).
+wordsize = ctypes.sizeof(ctypes.c_void_p) * 8
+
+#: The word type, used for parameter and return types in functions.
+word_t = {64: ctypes.c_int64,
+          32: ctypes.c_int32,
+          16: ctypes.c_int16,
+           8: ctypes.c_int8}.get(wordsize, ctypes.c_int)
+
+
 class Node(object):
     """A node in the code (jit_node_t pointer)."""
     def __init__(self, jit_node_ptr):
@@ -98,18 +108,16 @@ class State(object):
         return Node(self.lib._jit_arg(self.state))
 
     def getarg(self, register, node):
-        if Lightning.wordsize == 64:
-            get = self.lib._jit_getarg_l
-        elif Lightning.wordsize == 32:
-            get = self.lib._jit_getarg_i
+        if wordsize == 32:
+            return self.getarg_i(register, node)
         else:
-            raise NotImplementedError("Unsupported wordsize %d" %
-                    Lightning.wordsize)
-        return Node(get(self.state, register, node.value))
+            return self.getarg_l(register, node)
 
     def getarg_l(self, register, node):
-        assert(Lightning.wordsize == 64)
         return Node(self.lib._jit_getarg_l(self.state, register, node.value))
+
+    def getarg_i(self, register, node):
+        return Node(self.lib._jit_getarg_i(self.state, register, node.value))
 
     def note(self, name=None, line=None):
         if line is None:
@@ -136,24 +144,28 @@ class State(object):
         return self._www(Code.muli, dst, src, immediate)
 
     def str(self, dst, src):
-        if Lightning.wordsize == 64:
-            code = Code.str_l
-        elif Lightning.wordsize == 32:
-            code = Code.str_i
+        if wordsize == 32:
+            return self.str_i(dst, src)
         else:
-            raise NotImplementedError("Unsupported wordsize %d" %
-                    Lightning.wordsize)
-        return self._ww(code, dst, src)
+            return self.str_l(dst, src)
+
+    def str_i(self, dst, src):
+        return self._ww(Code.str_i, dst, src)
+
+    def str_l(self, dst, src):
+        return self._ww(Code.str_l, dst, src)
 
     def ldr(self, dst, src):
-        if Lightning.wordsize == 64:
-            code = Code.ldr_l
-        elif Lightning.wordsize == 32:
-            code = Code.ldr_i
+        if wordsize == 32:
+            return self.ldr_i(dst, src)
         else:
-            raise NotImplementedError("Unsupported wordsize %d" %
-                    Lightning.wordsize)
-        return self._ww(code, dst, src)
+            return self.ldr_l(dst, src)
+
+    def ldr_l(self, dst, src):
+        return self._ww(Code.ldr_l, dst, src)
+
+    def ldr_i(self, dst, src):
+        return self._ww(Code.ldr_i, dst, src)
 
     def ret(self):
         self.lib._jit_ret(self.state)
@@ -164,9 +176,9 @@ class State(object):
     def emit(self):
         return Pointer(self.lib._jit_emit(self.state))
 
-    def emit_function(self, return_type=None, *argtypes):
+    def emit_function(self, return_type=None, argtypes=[]):
         """Compiles code and returns a Python-callable function."""
-        make_func = ctypes.CFUNCTYPE(return_type)
+        make_func = ctypes.CFUNCTYPE(return_type, *argtypes)
         code = self.emit()
         func = make_func(code.value)
 
@@ -181,26 +193,8 @@ class State(object):
         return weakref.proxy(func)
 
 
-class Int64(ctypes.c_int64):
-    @classmethod
-    def from_param(cls, value):
-        if not isinstance(value, ctypes.c_int64):
-            value = ctypes.c_int64(value)
-        return value
-
-
 class Lightning(object):
     """The main GNU Lightning interface."""
-    wordsize = 8*ctypes.sizeof(ctypes.c_void_p)
-
-    # word_t property
-    if wordsize == 64:
-        word_t = ctypes.c_int64
-    elif wordsize == 32:
-        word_t = ctypes.c_int32
-    else:
-        raise NotSupportedError("Unsupported wordsize %d" %
-                Lighting.wordsize)
 
     def __init__(self, liblightning=None, program=None):
         """Bindings to GNU Lightning library.
@@ -234,15 +228,13 @@ class Lightning(object):
     def _set_signatures(self):
         """Sets return and parameter types for the foreign C functions."""
 
-        # We currently pass structs as void pointers, and void returns are set
-        # to None (TODO: Find out if None means void for ctypes)
+        # We currently pass structs as void pointers.
         code_t = ctypes.c_int
         gpr_t = ctypes.c_int32
         node_p = ctypes.c_void_p
         pointer_t = ctypes.c_void_p
         state_p = ctypes.c_void_p
         void = None
-        word_t = Lightning.word_t
 
         def sig(rettype, fname, *ptypes):
             func = getattr(self.lib, fname)
