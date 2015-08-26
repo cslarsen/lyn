@@ -14,7 +14,7 @@ dist:
 	WHEEL_TOOL=$(shell which wheel) $(PYTHON) setup.py sdist bdist_wheel
 
 publish: dist
-	find dist -type f -exec gpg --detach-sign -a {} \;
+	find dist -type f -exec gpg2 --detach-sign -a {} \;
 	twine upload dist/*
 
 setup-pypi-test:
