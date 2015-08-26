@@ -228,9 +228,8 @@ On my computer, this outputs::
         \xec\x48\x8b\x2c\x24\x48\x83\xc4
         \x30\xc3
 
-Capstone has a lot of neat features. I happen to favour AT&T assembly syntax,
-but you can easily change that in the above code. But if you set ``md.detail =
-True``, you'll be able to see implicit registers and a lot of other cool stuff.
+Capstone has a lot of neat features. If you set ``md.detail = True``, you'll be
+able to see implicit registers and a lot of other cool stuff.
 
 At some point, I'll probably integrate Capstone into Lyn.
 
