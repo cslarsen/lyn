@@ -148,12 +148,18 @@ compatibility convenience for Python 2 and 3 users. Use this type instead of
 Example: Disassembling native code with Capstone
 ------------------------------------------------
 
-If you install Capstone, you can use it as a disassembler for the generated
-functions.  At some point, I'll integrate Capstone into Lyn::
+If you install Capstone, you can use it as a disassembler::
 
-    from lyn import Lightning, Register, word_t
+    from lyn import *
     import capstone
     import ctypes
+
+    def hexbytes(b):
+        return "".join(map(lambda x: hex(x)[2:] + " ", b))
+
+    def chunkstring(string, length):
+        # Taken from http://stackoverflow.com/a/18854817/21028
+        return (string[0+i:length+i] for i in range(0, len(string), length))
 
     lib = Lightning()
     jit = lib.state()
@@ -162,13 +168,13 @@ functions.  At some point, I'll integrate Capstone into Lyn::
     start = jit.note()
     jit.prolog()
     arg = jit.arg()
-    jit.getarg(Register.r0, arg)
-    jit.addi(Register.r0, Register.r0, 1)
-    jit.retr(Register.r0)
+    jit.getarg(R0, arg)
+    jit.addi(R0, R0, 1)
+    jit.retr(R0)
     jit.epilog()
     end = jit.note()
 
-    # Bind function to Python: returns a word (native integer), takes a word.
+    # Bind foreign function
     incr = jit.emit_function(word_t, [word_t])
 
     # Sanity check
@@ -181,17 +187,22 @@ functions.  At some point, I'll integrate Capstone into Lyn::
     ctypes.memmove(codebuf, ctypes.c_char_p(incr.address.value), length)
     print("Compiled %d bytes starting at 0x%x" % (length, incr.address))
 
-    def hexbytes(b):
-        return "".join(map(lambda x: hex(x)[2:] + " ", b))
-
     # Capstone is smart enough to stop at the first RET-like instruction.
+    # (But, obviously, not enough to guess it's host architecture)
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
-    md.syntax = capstone.CS_OPT_SYNTAX_ATT # Change to Intel syntax if you want
+
+    # Change to Intel syntax, if you want
+    md.syntax = capstone.CS_OPT_SYNTAX_ATT
+
+    # Print native instructions
     for i in md.disasm(codebuf, incr.address.value):
         print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
 
+    # ... and its raw bytes
+    print("\nRaw bytes:")
     raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))
-    print("\nRaw bytes: %s" % raw)
+    for line in chunkstring(raw, 8*4):
+        print("    %s" % line)
 
     jit.release()
     lib.release()
@@ -220,6 +231,8 @@ On my computer, this outputs::
 Capstone has a lot of neat features. I happen to favour AT&T assembly syntax,
 but you can easily change that in the above code. But if you set ``md.detail =
 True``, you'll be able to see implicit registers and a lot of other cool stuff.
+
+At some point, I'll probably integrate Capstone into Lyn.
 
 Author and license
 ------------------

@@ -23,7 +23,9 @@ Example output:
     0x10acf401d 48 83 c4 30    addq $0x30, %rsp
     0x10acf4021 c3             retq
 
-    Raw bytes: \x48\x83\xec\x30\x48\x89\x2c\x24[...]
+    Raw bytes:
+        \x48\x83\xec\x30\x48\x89\x2c\x24
+        ...
 
 For this to work, you need the GNU Lightning shared library (liblightning.*) in
 the library search path. You also need Capstone, which you can get from PyPi.
@@ -31,9 +33,16 @@ the library search path. You also need Capstone, which you can get from PyPi.
 2015-08-23 Christian Stigen Larsen
 """
 
-from lyn import Lightning, Register, word_t
+from lyn import *
 import capstone
 import ctypes
+
+def hexbytes(b):
+    return "".join(map(lambda x: hex(x)[2:] + " ", b))
+
+def chunkstring(string, length):
+    # Taken from http://stackoverflow.com/a/18854817/21028
+    return (string[0+i:length+i] for i in range(0, len(string), length))
 
 lib = Lightning()
 jit = lib.state()
@@ -42,13 +51,13 @@ jit = lib.state()
 start = jit.note()
 jit.prolog()
 arg = jit.arg()
-jit.getarg(Register.r0, arg)
-jit.addi(Register.r0, Register.r0, 1)
-jit.retr(Register.r0)
+jit.getarg(R0, arg)
+jit.addi(R0, R0, 1)
+jit.retr(R0)
 jit.epilog()
 end = jit.note()
 
-# Bind function to Python: returns a word (native integer), takes a word.
+# Bind foreign function
 incr = jit.emit_function(word_t, [word_t])
 
 # Sanity check
@@ -61,19 +70,18 @@ codebuf = ctypes.create_string_buffer(length)
 ctypes.memmove(codebuf, ctypes.c_char_p(incr.address.value), length)
 print("Compiled %d bytes starting at 0x%x" % (length, incr.address))
 
-def hexbytes(b):
-    return "".join(map(lambda x: hex(x)[2:] + " ", b))
-
 # Capstone is smart enough to stop at the first RET-like instruction.
+# (But, obviously, not enough to guess it's host architecture)
 md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
-md.syntax = capstone.CS_OPT_SYNTAX_ATT # Change to Intel syntax if you want
+
+# Change to Intel syntax, if you want
+md.syntax = capstone.CS_OPT_SYNTAX_ATT
+
+# Print native instructions
 for i in md.disasm(codebuf, incr.address.value):
     print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
 
-def chunkstring(string, length):
-    # Taken from http://stackoverflow.com/a/18854817/21028
-    return (string[0+i:length+i] for i in range(0, len(string), length))
-
+# ... and its raw bytes
 print("\nRaw bytes:")
 raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))
 for line in chunkstring(raw, 8*4):
