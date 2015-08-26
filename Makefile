@@ -25,7 +25,7 @@ setup-pypi-publish:
 	$(PYTHON) setup.py sdist upload --sign -r pypi
 
 lint:
-	$(PYFLAKES) lyn/*.py tests/*.py examples/*.py
+	$(PYFLAKES) lyn/*.py tests/*.py examples/*.py || exit 0
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;

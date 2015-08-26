@@ -1,4 +1,5 @@
 Major changes for 0.0.7
+- Adds short hand register names
 
 Major changes for 0.0.6
 - Adds more instructions and examples: Can now call C-functions.

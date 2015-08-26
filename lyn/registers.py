@@ -67,3 +67,24 @@ class Register(enum.IntEnum):
     else:
         raise NotImplementedError("Machine %s not supported" %
                 platform.machine())
+
+# Short-hand forms
+
+R0 = Register.r0
+R1 = Register.r1
+R2 = Register.r2
+R3 = Register.r3
+
+V0 = Register.v0
+V1 = Register.v1
+V2 = Register.v2
+V3 = Register.v3
+
+F0 = Register.f0
+F1 = Register.f1
+F2 = Register.f2
+F3 = Register.f3
+F4 = Register.f4
+F5 = Register.f5
+F6 = Register.f6
+F7 = Register.f7
