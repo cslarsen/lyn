@@ -154,6 +154,24 @@ class TestLyn(unittest.TestCase):
                 for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
                     self.assertEqual(func(n), n)
 
+    def test_strlen(self):
+        libc = self.lyn.load("c")
+        with self.lyn.state() as jit:
+            jit.prolog()
+            jit.getarg(Register.r0, jit.arg())
+            jit.pushargr(Register.r0)
+            jit.finishi(libc.strlen)
+            jit.retval(Register.r0)
+            jit.retr(Register.r0)
+            jit.epilog()
+
+            strlen = jit.emit_function(lyn.word_t, [lyn.char_p])
+
+            self.assertEqual(strlen(""), 0)
+            self.assertEqual(strlen("h"), 1)
+            self.assertEqual(strlen("he"), 2)
+            self.assertEqual(strlen("hello"), 5)
+
     def test_sequential_states(self):
         with self.lyn.state() as a:
             self.assertFalse(a is None)
