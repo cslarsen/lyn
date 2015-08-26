@@ -4,7 +4,7 @@ setup(
     name="lyn",
     packages=["lyn"],
     version="0.0.7",
-    description="Python bindings for GNU Lightning JIT",
+    description="Python bindings for GNU Lightning",
     author="Christian Stigen Larsen",
     author_email="csl@csl.name",
     url="https://github.com/cslarsen/lyn",

@@ -1,7 +1,7 @@
 lyn — Python bindings for GNU Lightning
 =======================================
 
-Lyn provides Python bindings for GNU Lightning::
+Lyn brings GNU Lightning to Python::
 
     GNU lightning is a library that generates assembly language code at
     run-time; it is very fast, making it ideal for Just-In-Time compilers, and
@@ -10,8 +10,8 @@ Lyn provides Python bindings for GNU Lightning::
 
 Lyn has been verified to work on Python versions 2.6, 2.7, 3.3 and 3.4.
 
-The source code is on GitHub: https://github.com/cslarsen/lyn/  
-Releases are uploaded to PyPI: https://pypi.python.org/pypi/lyn/
+The source code is on GitHub at https://github.com/cslarsen/lyn/ and releases are
+uploaded to PyPI at https://pypi.python.org/pypi/lyn/.
 
 *"Lyn"* is the Norwegian word for "lightning".
 
