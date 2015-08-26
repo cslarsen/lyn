@@ -30,11 +30,11 @@ examples below.
 Installation
 ------------
 
-From PyPi::
+Install from PyPi::
 
     $ pip install lyn
 
-From the bleeding edge::
+Install from sources, aka the bleeding edge::
 
     $ git clone https://github.com/cslarsen/lyn
     $ cd lyn
