@@ -221,8 +221,8 @@ class State(object):
     def pushargr(self, register):
         return self.lib._jit_pushargr(self.state, register)
 
-    def pushargi(self, register):
-        return self.lib._jit_pushargi(self.state, register)
+    def pushargi(self, immediate):
+        return self.lib._jit_pushargi(self.state, immediate)
 
     def addr_f(self, dst, src1, src2):
         return self._www(Code.addr_f, dst, src1, src2)
@@ -407,8 +407,18 @@ class State(object):
     def reti(self, immediate):
         self.lib._jit_reti(self.state, immediate)
 
-    def retval_i(self, immediate):
-        return self.lib._jit_retval_i(self.state, immediate)
+    def retval_i(self, register):
+        return self.lib._jit_retval_i(self.state, register)
+
+    def retval_l(self, register):
+        return self.lib._jit_retval_l(self.state, register)
+
+    def retval(self, register):
+        if wordsize == 32:
+            return self.retval_i(register)
+        else:
+            return self.retval_l(register)
+
 
     def emit(self):
         return Pointer(self.lib._jit_emit(self.state))
