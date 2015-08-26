@@ -8,6 +8,8 @@ Lyn provides Python bindings for GNU Lightning::
     it abstracts over the target CPU, as it exposes to the clients a
     standardized RISC instruction set inspired by the MIPS and SPARC chips.
 
+Lyn has been verified to work on Python versions 2.6, 2.7, 3.3 and 3.4.
+
 The source code is on GitHub: https://github.com/cslarsen/lyn/  
 Releases are uploaded to PyPI: https://pypi.python.org/pypi/lyn/
 
