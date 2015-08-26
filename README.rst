@@ -102,9 +102,8 @@ but you'll waste memory. In such a case, OS will free up the memory at exit.
 Example: Calling a C function
 -----------------------------
 
-This example shows how to call C functions from GNU Lightning. In the example
-below, we create a function that takes a string argument and returns the result
-of passing it to ``strlen``::
+This example shows how to call C functions from GNU Lightning. Here, we create
+a function that simply wraps ``strlen``::
 
     import lyn
     from lyn import Register, Lightning
