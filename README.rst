@@ -44,8 +44,11 @@ Non-Python Dependencies
 
 You must install the following libraries using your favourite package manager:
 
-    * The GNU Lightning shared library, http://www.gnu.org/software/lightning/
-    * Optional: The Capstone Disassembler, http://www.capstone-engine.org
+    * The GNU Lightning shared library v2.1.0 (later versions may also work),
+      http://www.gnu.org/software/lightning/
+
+    * Optional: The Capstone Disassembler,
+      http://www.capstone-engine.org
 
 The last time I compiled GNU Lightning on Linux, I had to disable the
 disassembly options because of linker problems with ``libopcodes.so``.  This
