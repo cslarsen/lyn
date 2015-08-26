@@ -21,12 +21,24 @@ setup(
     ],
 
     keywords=["jit", "compilation", "bytecode", "assembly", "just-in-time",
-        "compiler", "machine code", "native code", "speed"],
+        "compiler", "machine code", "native code", "speed", "gnu", "lightning",
+        "fast", "compile", "c", "ffi", "ctypes"],
 
     platforms=['unix', 'linux', 'osx', 'cygwin', 'win32'],
 
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Natural Language :: English",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX",
+        "Operating System :: Unix",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: Implementation :: PyPy",
     ],
 )
