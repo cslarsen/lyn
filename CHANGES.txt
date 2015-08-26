@@ -1,5 +1,5 @@
 Major changes for 0.0.6
-- Adds more instructions.
+- Adds more instructions and examples: Can now call C-functions.
 
 Major changes for 0.0.5
 - Fixes bug in emit_function regarding function types.
