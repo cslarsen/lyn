@@ -1,4 +1,5 @@
-Major changes for v0.0.6
+Major changes for 0.0.6
+- Adds more instructions.
 
 Major changes for 0.0.5
 - Fixes bug in emit_function regarding function types.

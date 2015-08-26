@@ -1,4 +1,4 @@
-from lyn import *
+from lyn import Lightning, word_t, Register
 
 with Lightning() as lib:
     with lib.state() as jit:

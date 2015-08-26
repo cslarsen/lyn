@@ -11,12 +11,13 @@ on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
 
 from .lyn import (
     Lightning,
-    Register,
     State,
     char_p,
     word_t,
     wordsize,
 )
+
+from .registers import Register
 
 __all__ = [
     "Lightning",

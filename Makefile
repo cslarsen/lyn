@@ -1,11 +1,10 @@
 PYTHON := python
 PYFLAKES := pyflakes
 
-default: test
+default: test lint
 
 test:
 	$(PYTHON) setup.py test
-	PYTHONPATH=. $(PYTHON) examples/return-123.py
 
 check: test
 
@@ -26,7 +25,7 @@ setup-pypi-publish:
 	$(PYTHON) setup.py sdist upload --sign -r pypi
 
 lint:
-	$(PYFLAKES) lyn/*.py tests/*.py
+	$(PYFLAKES) lyn/*.py tests/*.py examples/*.py
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} \;

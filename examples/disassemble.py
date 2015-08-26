@@ -31,7 +31,7 @@ the library search path. You also need Capstone, which you can get from PyPi.
 2015-08-23 Christian Stigen Larsen
 """
 
-from lyn import *
+from lyn import Lightning, Register, word_t
 import capstone
 import ctypes
 
