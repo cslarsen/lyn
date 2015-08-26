@@ -70,8 +70,14 @@ md.syntax = capstone.CS_OPT_SYNTAX_ATT # Change to Intel syntax if you want
 for i in md.disasm(codebuf, incr.address.value):
     print("0x%x %-15s%s %s" % (i.address, hexbytes(i.bytes), i.mnemonic, i.op_str))
 
+def chunkstring(string, length):
+    # Taken from http://stackoverflow.com/a/18854817/21028
+    return (string[0+i:length+i] for i in range(0, len(string), length))
+
+print("\nRaw bytes:")
 raw = "".join(map(lambda x: "\\x%02x" % x, map(ord, codebuf)))
-print("\nRaw bytes: %s" % raw)
+for line in chunkstring(raw, 8*4):
+    print("    %s" % line)
 
 jit.release()
 lib.release()
