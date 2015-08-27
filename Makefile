@@ -1,7 +1,7 @@
 PYTHON := python
 PYFLAKES := pyflakes
 
-default: test lint
+default: test #lint
 
 test:
 	$(PYTHON) setup.py test

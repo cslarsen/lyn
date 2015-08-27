@@ -14,3 +14,5 @@ with Lightning() as lib:
         for a in xrange(-100, 100):
             for b in xrange(-100, 100):
                 assert(mul(a,b) == a*b)
+
+print("OK")

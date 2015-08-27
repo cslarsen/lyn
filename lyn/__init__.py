@@ -11,11 +11,13 @@ on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
 
 from .lyn import (
     Lightning,
-    State,
     char_p,
     word_t,
     wordsize,
 )
+
+from .emit import State
+from .node import Node
 
 from .registers import (
     F0,
@@ -47,6 +49,7 @@ __all__ = [
     "F6",
     "F7",
     "Lightning",
+    "Node",
     "R0",
     "R1",
     "R2",
