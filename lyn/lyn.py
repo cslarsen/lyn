@@ -117,6 +117,9 @@ class State(object):
     def _www(self, code, *args):
         return Node(self.lib._jit_new_node_www(self.state, code, *args))
 
+    def _pww(self, code, *args):
+        return Node(self.lib._jit_new_node_pww(code, *args))
+
     def _qww(self, code, *args):
         return Node(self.lib._jit_new_node_qww(self.state, code, *args))
 
@@ -139,6 +142,30 @@ class State(object):
 
     def address(self, node):
         return Pointer(self.lib._jit_address(self.state, node.value))
+
+    def beqr(self, v, w):
+        return self._pww(Code.beqr, None, v, w)
+
+    def beqi(self, v, w):
+        return self._pww(Code.beqi, None, v, w)
+
+    def label(self):
+        return Node(self.lib._jit_label(self.state))
+
+    def forward(self):
+        return Node(self.lib._jit_forward(self.state))
+
+    def indirect(self):
+        return Node(self.lib._jit_indirect(self.state))
+
+    def link(self, node):
+        self.lib._jit_link(self.state, node.value)
+
+    def patch(self, node):
+        self.lib._jit_patch(self.state, node.value)
+
+    def patch_at(self, node1, node2):
+        self.lib._jit_patch_at(self.state, node1.value, node2.value)
 
     def arg(self):
         # TODO: _c _uc _s _us _i _ui _l
@@ -529,8 +556,12 @@ class Lightning(object):
             func.argtypes = ptypes
 
         sig(node_p, "_jit_arg", state_p)
-        sig(node_p, "_jit_finishi", state_p, pointer_t);
+        sig(node_p, "_jit_finishi", state_p, pointer_t)
+        sig(node_p, "_jit_forward", state_p)
+        sig(node_p, "_jit_indirect", state_p)
+        sig(node_p, "_jit_label", state_p)
         sig(node_p, "_jit_new_node_p", state_p, code_t, pointer_t)
+        sig(node_p, "_jit_new_node_pww", state_p, code_t, pointer_t, word_t, word_t)
         sig(node_p, "_jit_new_node_qww", state_p, code_t, int32_t, int32_t, word_t)
         sig(node_p, "_jit_new_node_w", state_p, code_t, word_t)
         sig(node_p, "_jit_new_node_ww", state_p, code_t, word_t, word_t)
@@ -543,9 +574,12 @@ class Lightning(object):
         sig(void, "_jit_destroy_state", state_p)
         sig(void, "_jit_ellipsis", state_p)
         sig(void, "_jit_epilog", state_p)
-        sig(void, "_jit_finishr", state_p, gpr_t);
+        sig(void, "_jit_finishr", state_p, gpr_t)
         sig(void, "_jit_getarg_i", state_p, gpr_t, node_p)
         sig(void, "_jit_getarg_l", state_p, gpr_t, node_p)
+        sig(void, "_jit_link", state_p, node_p)
+        sig(void, "_jit_patch", state_p, node_p)
+        sig(void, "_jit_patch_at", state_p, node_p, node_p)
         sig(void, "_jit_prepare", state_p)
         sig(void, "_jit_prolog", state_p)
         sig(void, "_jit_pushargi", state_p, word_t)
@@ -562,8 +596,8 @@ class Lightning(object):
         sig(void, "init_jit", char_p)
 
         if wordsize == 64:
-            sig(void, "_jit_retval_l", state_p, gpr_t);
-            sig(void, "_jit_retval_ui", state_p, gpr_t);
+            sig(void, "_jit_retval_l", state_p, gpr_t)
+            sig(void, "_jit_retval_ui", state_p, gpr_t)
 
     def state(self):
         """Returns a new JIT state. You have to clean up by calling .destroy()
