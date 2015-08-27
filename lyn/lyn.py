@@ -315,13 +315,19 @@ class State(object):
         return self._www(Code.rsbr, dst, src1, src2)
 
     def rsbr_f(self, dst, src1, src2):
-        return self._www(Code.rsbr_f, dst, src1, src2)
+        return self.subr_f(dst, src1, src2)
 
     def rsbr_d(self, dst, src1, src2):
         return self._www(Code.rsbr_d, dst, src1, src2)
 
     def rsbi(self, dst, src1, src2):
         return self._www(Code.rsbi, dst, src1, src2)
+
+    def rsbi_f(self, dst, src1, src2):
+        return self._wwf(Code.rsbi_f, dst, src1, src2)
+
+    def rsbi_i(self, dst, src1, src2):
+        return self._www(Code.rsbi_i, dst, src1, src2)
 
     def mulr(self, dst, src1, src2):
         return self._www(Code.mulr, dst, src1, src2)
