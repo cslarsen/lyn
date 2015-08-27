@@ -118,13 +118,19 @@ class State(object):
         return Node(self.lib._jit_new_node_www(self.state, code, *args))
 
     def _pww(self, code, *args):
-        return Node(self.lib._jit_new_node_pww(code, *args))
+        return Node(self.lib._jit_new_node_pww(self.state, code, *args))
+
+    def _p(self, code, *args):
+        return Node(self.lib._jit_new_node_p(self.state, code, *args))
 
     def _qww(self, code, *args):
         return Node(self.lib._jit_new_node_qww(self.state, code, *args))
 
     def _ww(self, code, *args):
         return Node(self.lib._jit_new_node_ww(self.state, code, *args))
+
+    def _w(self, code, *args):
+        return Node(self.lib._jit_new_node_w(self.state, code, *args))
 
     def _w(self, code, *args):
         return Node(self.lib._jit_new_node_w(self.state, code, *args))
@@ -146,8 +152,14 @@ class State(object):
     def beqr(self, v, w):
         return self._pww(Code.beqr, None, v, w)
 
-    def beqi(self, v, w):
-        return self._pww(Code.beqi, None, v, w)
+    def beqi(self, node, register, immediate):
+        return self._pww(Code.beqi, node.value, register, immediate)
+
+    def jmpr(self, register):
+        return self._w(Code.jmpr, register)
+
+    def jmpi(self):
+        return Pointer(self._p(Code.jmpr, None))
 
     def label(self):
         return Node(self.lib._jit_label(self.state))

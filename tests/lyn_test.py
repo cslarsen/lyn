@@ -180,5 +180,30 @@ class TestLyn(unittest.TestCase):
             self.assertFalse(a is None)
             self.assertFalse(b is None)
 
+    def test_forward_branch(self):
+        with self.lyn.state() as jit:
+            jit.prolog()
+
+            arg = jit.arg()
+            jit.getarg(Register.r0, arg)
+
+            true = jit.forward()
+            jit.andi(Register.r0, Register.r0, 1)
+            jump = jit.beqi(true, Register.r0, 1)
+            jit.patch_at(jump, true)
+
+            # False
+            jit.reti(123)
+
+            # True
+            jit.link(true)
+            jit.reti(456)
+
+            jit.epilog()
+
+            odd = jit.emit_function(lyn.word_t, [lyn.word_t])
+            for n in range(100):
+                self.assertEqual(odd(n), 456 if (n & 1) else 123)
+
 if __name__ == "__main__":
     unittest.main()
