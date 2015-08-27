@@ -14,6 +14,16 @@ class State(object):
         self.functions = []
         self.lib = lib
         self.state = state
+        self._prolog = False
+
+    def _assert_prolog(self):
+        """Used to guard against missing prologs.
+
+        E.g., calling ``pushargi`` without a prior call to ``prolog()`` will
+        result in a segfault.
+        """
+        if self._prolog == False:
+            raise RuntimeError("Requires a prolog")
 
     def release(self):
         """Destroys the state, along with its functions."""
@@ -88,6 +98,7 @@ class Emitter(State):
             return self.getarg_l(register, node)
 
     def getarg_l(self, register, node):
+        self._assert_prolog()
         return Node(self.lib._jit_getarg_l(self.state, register, node.value))
 
     def putargr(self, register, node):
@@ -146,6 +157,9 @@ class Emitter(State):
         return self.lib._jit_link(self.state, node.value)
 
     def prolog(self):
+        if self._prolog == True:
+            raise ValueError("Prolog already emitted")
+        self._prolog = True
         return self.lib._jit_prolog(self.state)
 
     def ellipsis(self):
@@ -155,6 +169,7 @@ class Emitter(State):
         return self.lib._jit_allocai(self.state, u)
 
     def arg(self):
+        self._assert_prolog()
         return Node(self.lib._jit_arg(self.state))
 
     def getarg_c(self, u, v):
@@ -635,6 +650,7 @@ class Emitter(State):
         return self.lib._jit_pushargr(self.state, u)
 
     def pushargi(self, u):
+        self._assert_prolog()
         return self.lib._jit_pushargi(self.state, u)
 
     def finishr(self, u):
@@ -683,6 +699,8 @@ class Emitter(State):
         return self.lib._jit_retval_i(self.state, u)
 
     def epilog(self, ):
+        self._assert_prolog()
+        self._prolog = False
         return self.lib._jit_epilog(self.state)
 
     def arg_f(self, ):
