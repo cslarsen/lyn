@@ -50,6 +50,15 @@ class State(object):
         else:
             make_func = ctypes.CFUNCTYPE(return_type)
 
+        # NOTE: An optional way of binding the function is to use cffi.
+        # It's a tad faster then emit_function_fast:
+        #   import cffi
+        #   ffi = cffi.FFI()
+        #   ...
+        #   code = jit.emit()
+        #   func = ffi.cast("long (*fptr)(long, long)", code.value)
+        #   func(123)
+
         code = self.emit()
         func = make_func(code.value)
 
