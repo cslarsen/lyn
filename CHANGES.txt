@@ -1,6 +1,8 @@
 Major changes for 0.0.7
 - Adds short hand register names
 - Adds a *lot* of instructions, most currently untested.
+- Adds emit_function_fast with 2.2 times less calling overhead, plus new
+  parameters to emit_function.
 
 Major changes for 0.0.6
 - Adds more instructions and examples: Can now call C-functions.

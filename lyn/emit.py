@@ -42,9 +42,14 @@ class State(object):
         instructions."""
         self.lib._jit_clear_state(self.state)
 
-    def emit_function(self, return_type=None, argtypes=[]):
+    def emit_function(self, return_type=None, argtypes=[], weakref=True):
         """Compiles code and returns a Python-callable function."""
-        make_func = ctypes.CFUNCTYPE(return_type, *argtypes)
+
+        if argtypes is not None:
+            make_func = ctypes.CFUNCTYPE(return_type, *argtypes)
+        else:
+            make_func = ctypes.CFUNCTYPE(return_type)
+
         code = self.emit()
         func = make_func(code.value)
 
@@ -55,8 +60,48 @@ class State(object):
         # Because functions code are munmapped when we call _jit_destroy_state,
         # we need to return weakrefs to the functions. Otherwise, a user could
         # call a function that points to invalid memory.
-        self.functions.append(func)
-        return weakref.proxy(func)
+        if weakref:
+            self.functions.append(func)
+            return weakref.proxy(func)
+        else:
+            return func
+
+    def emit_function_fast(self, return_type=None):
+        """As emit_function, but returns a function with less calling overhead.
+
+        Equivalent to calling:
+
+            emit_function(..., argtypes=None, weakref=False)
+
+        In cases where you absolutely must call the generated code many, many
+        times, this emitter is a tad faster: In informal tests, it has 2.2
+        times less overhead than ``emit_function``, but still has an overhead
+        of 1.7 times compared to calling a pure Python function.
+
+        The following caveats apply:
+
+            - The returned function is not a weakref, meaning that if you
+              destroy the JIT state, the function will point to a dangling
+              memory region. Calling it will then result in an immediate
+              segfault, or worse. You can use the ``release`` methods of the
+              Lyn Lightning and Lyn State objects to control the lifetime
+              yourself.
+
+            - Argument types are not set, meaning that the number of arguments
+              and their types are not checked at call time. If you need to pass
+              special objects, like strings or structs, you have to create them
+              yourself using ctypes and pass their addresses.
+
+        Normally, you'll want to use ``emit_function``, which is safer. But in
+        cases where you'll be calling the generated functions *many* times,
+        this one is a tad faster: The overhead is reduced by about 2.2 times
+        (in informal tests) compared to emit_function, but there is still
+        overhead of about 1.7 times compared to what a native Python call would
+        have. So, the general strategy is to build large functions with Lyn,
+        reducing the number of function calls you make from Python, or use this
+        function, which is a bit more cumbersome to deal with.
+        """
+        return self.emit_function(return_type, argtypes=None, weakref=None)
 
 
 class Emitter(State):
