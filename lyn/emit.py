@@ -42,7 +42,7 @@ class State(object):
         instructions."""
         self.lib._jit_clear_state(self.state)
 
-    def emit_function(self, return_type=None, argtypes=[], weakref=True):
+    def emit_function(self, return_type=None, argtypes=[], proxy=True):
         """Compiles code and returns a Python-callable function."""
 
         if argtypes is not None:
@@ -60,7 +60,7 @@ class State(object):
         # Because functions code are munmapped when we call _jit_destroy_state,
         # we need to return weakrefs to the functions. Otherwise, a user could
         # call a function that points to invalid memory.
-        if weakref:
+        if proxy:
             self.functions.append(func)
             return weakref.proxy(func)
         else:
@@ -71,7 +71,7 @@ class State(object):
 
         Equivalent to calling:
 
-            emit_function(..., argtypes=None, weakref=False)
+            emit_function(..., argtypes=None, proxy=False)
 
         In cases where you absolutely must call the generated code many, many
         times, this emitter is a tad faster: In informal tests, it has 2.2
@@ -101,7 +101,7 @@ class State(object):
         reducing the number of function calls you make from Python, or use this
         function, which is a bit more cumbersome to deal with.
         """
-        return self.emit_function(return_type, argtypes=None, weakref=None)
+        return self.emit_function(return_type, argtypes=None, proxy=None)
 
 
 class Emitter(State):
