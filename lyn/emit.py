@@ -198,6 +198,7 @@ class Emitter(State):
         return self._w(Code.align, u)
 
     def name(self, u):
+        self._assert_prolog()
         return Node(self.lib._jit_name(self.state, u))
 
     def label(self):
@@ -219,9 +220,11 @@ class Emitter(State):
         return self.lib._jit_prolog(self.state)
 
     def ellipsis(self):
+        self._assert_prolog()
         return self.lib._jit_ellipsis(self.state)
 
     def allocai(self, u):
+        self._assert_prolog()
         return self.lib._jit_allocai(self.state, u)
 
     def arg(self):
@@ -229,18 +232,23 @@ class Emitter(State):
         return Node(self.lib._jit_arg(self.state))
 
     def getarg_c(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_c(self.state, u, v)
 
     def getarg_uc(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_uc(self.state, u, v)
 
     def getarg_s(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_s(self.state, u, v)
 
     def getarg_us(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_us(self.state, u, v)
 
     def getarg_i(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_i(self.state, u, v)
 
     def addr(self, u, v, w):
@@ -700,9 +708,11 @@ class Emitter(State):
         return self._p(Code.calli, u)
 
     def prepare(self, ):
+        self._assert_prolog()
         return self.lib._jit_prepare(self.state)
 
     def pushargr(self, u):
+        self._assert_prolog()
         return self.lib._jit_pushargr(self.state, u)
 
     def pushargi(self, u):
@@ -710,18 +720,23 @@ class Emitter(State):
         return self.lib._jit_pushargi(self.state, u)
 
     def finishr(self, u):
+        self._assert_prolog()
         return self.lib._jit_finishr(self.state, u)
 
     def finishi(self, u):
+        self._assert_prolog()
         return self.lib._jit_finishi(self.state, u)
 
     def ret(self, ):
+        self._assert_prolog()
         return self.lib._jit_ret(self.state)
 
     def retr(self, u):
+        self._assert_prolog()
         return self.lib._jit_retr(self.state, u)
 
     def reti(self, u):
+        self._assert_prolog()
         return self.lib._jit_reti(self.state, u)
 
     def retval(self, u):
@@ -731,6 +746,7 @@ class Emitter(State):
             return self.retval_l(u)
 
     def retval_f(self, u):
+        self._assert_prolog()
         return self.lib._jit_retval_f(self.state, u)
 
     def retval_l(self, u):
@@ -763,12 +779,15 @@ class Emitter(State):
         return Node(self._jit_arg_f(self.state))
 
     def getarg_f(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_getarg_f(self.state, u, v)
 
     def putargr_f(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_putargr_f(self.state, u, v)
 
     def putargi_f(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_putargi_f(self.state, u, v)
 
     def addr_f(self, u, v, w):
@@ -790,255 +809,262 @@ class Emitter(State):
         return self._wwf(Code.rsbi_f, u, v, w)
 
     def mulr_f(self, u, v, w):
-            return self._www(Code.mulr_f, u, v, w)
+        return self._www(Code.mulr_f, u, v, w)
 
     def muli_f(self, u, v, w):
-            return self._wwf(Code.muli_f, u, v, w)
+        return self._wwf(Code.muli_f, u, v, w)
 
     def divr_f(self, u, v, w):
-            return self._www(Code.divr_f, u, v, w)
+        return self._www(Code.divr_f, u, v, w)
 
     def divi_f(self, u, v, w):
-            return self._wwf(Code.divi_f, u, v, w)
+        return self._wwf(Code.divi_f, u, v, w)
 
     def negr_f(self, u, v):
-            return self._ww(Code.negr_f, u, v)
+        return self._ww(Code.negr_f, u, v)
 
     def absr_f(self, u, v):
-            return self._ww(Code.absr_f, u, v)
+        return self._ww(Code.absr_f, u, v)
 
     def sqrtr_f(self, u, v):
-            return self._ww(Code.sqrtr_f, u, v)
+        return self._ww(Code.sqrtr_f, u, v)
 
     def ltr_f(self, u, v, w):
-            return self._www(Code.ltr_f, u, v, w)
+        return self._www(Code.ltr_f, u, v, w)
 
     def lti_f(self, u, v, w):
-            return self._wwf(Code.lti_f, u, v, w)
+        return self._wwf(Code.lti_f, u, v, w)
 
     def ler_f(self, u, v, w):
-            return self._www(Code.ler_f, u, v, w)
+        return self._www(Code.ler_f, u, v, w)
 
     def lei_f(self, u, v, w):
-            return self._wwf(Code.lei_f, u, v, w)
+        return self._wwf(Code.lei_f, u, v, w)
 
     def eqr_f(self, u, v, w):
-            return self._www(Code.eqr_f, u, v, w)
+        return self._www(Code.eqr_f, u, v, w)
 
     def eqi_f(self, u, v, w):
-            return self._wwf(Code.eqi_f, u, v, w)
+        return self._wwf(Code.eqi_f, u, v, w)
 
     def ger_f(self, u, v, w):
-            return self._www(Code.ger_f, u, v, w)
+        return self._www(Code.ger_f, u, v, w)
 
     def gei_f(self, u, v, w):
-            return self._wwf(Code.gei_f, u, v, w)
+        return self._wwf(Code.gei_f, u, v, w)
 
     def gtr_f(self, u, v, w):
-            return self._www(Code.gtr_f, u, v, w)
+        return self._www(Code.gtr_f, u, v, w)
 
     def gti_f(self, u, v, w):
-            return self._wwf(Code.gti_f, u, v, w)
+        return self._wwf(Code.gti_f, u, v, w)
 
     def ner_f(self, u, v, w):
-            return self._www(Code.ner_f, u, v, w)
+        return self._www(Code.ner_f, u, v, w)
 
     def nei_f(self, u, v, w):
-            return self._wwf(Code.nei_f, u, v, w)
+        return self._wwf(Code.nei_f, u, v, w)
 
     def unltr_f(self, u, v, w):
-            return self._www(Code.unltr_f, u, v, w)
+        return self._www(Code.unltr_f, u, v, w)
 
     def unlti_f(self, u, v, w):
-            return self._wwf(Code.unlti_f, u, v, w)
+        return self._wwf(Code.unlti_f, u, v, w)
 
     def unler_f(self, u, v, w):
-            return self._www(Code.unler_f, u, v, w)
+        return self._www(Code.unler_f, u, v, w)
 
     def unlei_f(self, u, v, w):
-            return self._wwf(Code.unlei_f, u, v, w)
+        return self._wwf(Code.unlei_f, u, v, w)
 
     def uneqr_f(self, u, v, w):
-            return self._www(Code.uneqr_f, u, v, w)
+        return self._www(Code.uneqr_f, u, v, w)
 
     def uneqi_f(self, u, v, w):
-            return self._wwf(Code.uneqi_f, u, v, w)
+        return self._wwf(Code.uneqi_f, u, v, w)
 
     def unger_f(self, u, v, w):
-            return self._www(Code.unger_f, u, v, w)
+        return self._www(Code.unger_f, u, v, w)
 
     def ungei_f(self, u, v, w):
-            return self._wwf(Code.ungei_f, u, v, w)
+        return self._wwf(Code.ungei_f, u, v, w)
 
     def ungtr_f(self, u, v, w):
-            return self._www(Code.ungtr_f, u, v, w)
+        return self._www(Code.ungtr_f, u, v, w)
 
     def ungti_f(self, u, v, w):
-            return self._wwf(Code.ungti_f, u, v, w)
+        return self._wwf(Code.ungti_f, u, v, w)
 
     def ltgtr_f(self, u, v, w):
-            return self._www(Code.ltgtr_f, u, v, w)
+        return self._www(Code.ltgtr_f, u, v, w)
 
     def ltgti_f(self, u, v, w):
-            return self._wwf(Code.ltgti_f, u, v, w)
+        return self._wwf(Code.ltgti_f, u, v, w)
 
     def ordr_f(self, u, v, w):
-            return self._www(Code.ordr_f, u, v, w)
+        return self._www(Code.ordr_f, u, v, w)
 
     def ordi_f(self, u, v, w):
-            return self._wwf(Code.ordi_f, u, v, w)
+        return self._wwf(Code.ordi_f, u, v, w)
 
     def unordr_f(self, u, v, w):
-            return self._www(Code.unordr_f, u, v, w)
+        return self._www(Code.unordr_f, u, v, w)
 
     def unordi_f(self, u, v, w):
-            return self._wwf(Code.unordi_f, u, v, w)
+        return self._wwf(Code.unordi_f, u, v, w)
 
     def truncr_f_i(self, u, v):
-            return self._ww(Code.truncr_f_i, u, v)
+        return self._ww(Code.truncr_f_i, u, v)
 
     def extr_f(self, u, v):
-            return self._ww(Code.extr_f, u, v)
+        return self._ww(Code.extr_f, u, v)
 
     def extr_d_f(self, u, v):
-            return self._ww(Code.extr_d_f, u, v)
+        return self._ww(Code.extr_d_f, u, v)
 
     def movr_f(self, u, v):
-            return self._ww(Code.movr_f, u, v)
+        return self._ww(Code.movr_f, u, v)
 
     def movi_f(self, u, v):
-            return self._wf(Code.movi_f, u, v)
+        return self._wf(Code.movi_f, u, v)
 
     def ldr_f(self, u, v):
-            return self._ww(Code.ldr_f, u, v)
+        return self._ww(Code.ldr_f, u, v)
 
     def ldi_f(self, u, v):
-            return self._wp(Code.ldi_f, u, v)
+        return self._wp(Code.ldi_f, u, v)
 
     def ldxr_f(self, u, v, w):
-            return self._www(Code.ldxr_f, u, v, w)
+        return self._www(Code.ldxr_f, u, v, w)
 
     def ldxi_f(self, u, v, w):
-            return self._www(Code.ldxi_f, u, v, w)
+        return self._www(Code.ldxi_f, u, v, w)
 
     def str_f(self, u, v):
-            return self._ww(Code.str_f, u, v)
+        return self._ww(Code.str_f, u, v)
 
     def sti_f(self, u, v):
-            return self._pw(Code.sti_f, u, v)
+        return self._pw(Code.sti_f, u, v)
 
     def stxr_f(self, u, v, w):
-            return self._www(Code.stxr_f, u, v, w)
+        return self._www(Code.stxr_f, u, v, w)
 
     def stxi_f(self, u, v, w):
-            return self._www(Code.stxi_f, u, v, w)
+        return self._www(Code.stxi_f, u, v, w)
 
     def bltr_f(self, node, v, w):
-            return self._pww(Code.bltr_f, node.value, v, w)
+        return self._pww(Code.bltr_f, node.value, v, w)
 
     def blti_f(self, node, v, w):
-            return self._pwf(Code.blti_f, node.value, v, w)
+        return self._pwf(Code.blti_f, node.value, v, w)
 
     def bler_f(self, node, v, w):
-            return self._pww(Code.bler_f, node.value, v, w)
+        return self._pww(Code.bler_f, node.value, v, w)
 
     def blei_f(self, node, v, w):
-            return self._pwf(Code.blei_f, node.value, v, w)
+        return self._pwf(Code.blei_f, node.value, v, w)
 
     def beqr_f(self, node, v, w):
-            return self._pww(Code.beqr_f, node.value, v, w)
+        return self._pww(Code.beqr_f, node.value, v, w)
 
     def beqi_f(self, node, v, w):
-            return self._pwf(Code.beqi_f, node.value, v, w)
+        return self._pwf(Code.beqi_f, node.value, v, w)
 
     def bger_f(self, node, v, w):
-            return self._pww(Code.bger_f, node.value, v, w)
+        return self._pww(Code.bger_f, node.value, v, w)
 
     def bgei_f(self, node, v, w):
-            return self._pwf(Code.bgei_f, node.value, v, w)
+        return self._pwf(Code.bgei_f, node.value, v, w)
 
     def bgtr_f(self, node, v, w):
-            return self._pww(Code.bgtr_f, node.value, v, w)
+        return self._pww(Code.bgtr_f, node.value, v, w)
 
     def bgti_f(self, node, v, w):
-            return self._pwf(Code.bgti_f, node.value, v, w)
+        return self._pwf(Code.bgti_f, node.value, v, w)
 
     def bner_f(self, node, v, w):
-            return self._pww(Code.bner_f, node.value, v, w)
+        return self._pww(Code.bner_f, node.value, v, w)
 
     def bnei_f(self, node, v, w):
-            return self._pwf(Code.bnei_f, node.value, v, w)
+        return self._pwf(Code.bnei_f, node.value, v, w)
 
     def bunltr_f(self, node, v, w):
-            return self._pww(Code.bunltr_f, node.value, v, w)
+        return self._pww(Code.bunltr_f, node.value, v, w)
 
     def bunlti_f(self, node, v, w):
-            return self._pwf(Code.bunlti_f, node.value, v, w)
+        return self._pwf(Code.bunlti_f, node.value, v, w)
 
     def bunler_f(self, node, v, w):
-            return self._pww(Code.bunler_f, node.value, v, w)
+        return self._pww(Code.bunler_f, node.value, v, w)
 
     def bunlei_f(self, node, v, w):
-            return self._pwf(Code.bunlei_f, node.value, v, w)
+        return self._pwf(Code.bunlei_f, node.value, v, w)
 
     def buneqr_f(self, node, v, w):
-            return self._pww(Code.buneqr_f, node.value, v, w)
+        return self._pww(Code.buneqr_f, node.value, v, w)
 
     def buneqi_f(self, node, v, w):
-            return self._pwf(Code.buneqi_f, node.value, v, w)
+        return self._pwf(Code.buneqi_f, node.value, v, w)
 
     def bunger_f(self, node, v, w):
-            return self._pww(Code.bunger_f, node.value, v, w)
+        return self._pww(Code.bunger_f, node.value, v, w)
 
     def bungei_f(self, node, v, w):
-            return self._pwf(Code.bungei_f, node.value, v, w)
+        return self._pwf(Code.bungei_f, node.value, v, w)
 
     def bungtr_f(self, node, v, w):
-            return self._pww(Code.bungtr_f, node.value, v, w)
+        return self._pww(Code.bungtr_f, node.value, v, w)
 
     def bungti_f(self, node, v, w):
-            return self._pwf(Code.bungti_f, node.value, v, w)
+        return self._pwf(Code.bungti_f, node.value, v, w)
 
     def bltgtr_f(self, node, v, w):
-            return self._pww(Code.bltgtr_f, node.value, v, w)
+        return self._pww(Code.bltgtr_f, node.value, v, w)
 
     def bltgti_f(self, node, v, w):
-            return self._pwf(Code.bltgti_f, node.value, v, w)
+        return self._pwf(Code.bltgti_f, node.value, v, w)
 
     def bordr_f(self, node, v, w):
-            return self._pww(Code.bordr_f, node.value, v, w)
+        return self._pww(Code.bordr_f, node.value, v, w)
 
     def bordi_f(self, node, v, w):
-            return self._pwf(Code.bordi_f, node.value, v, w)
+        return self._pwf(Code.bordi_f, node.value, v, w)
 
     def bunordr_f(self, node, v, w):
-            return self._pww(Code.bunordr_f, node.value, v, w)
+        return self._pww(Code.bunordr_f, node.value, v, w)
 
     def bunordi_f(self, node, v, w):
-            return self._pwf(Code.bunordi_f, node.value, v, w)
+        return self._pwf(Code.bunordi_f, node.value, v, w)
 
     def pushargr_f(self, u):
-            return self.lib._jit_pushargr_f(self.state, u)
+        self._assert_prolog()
+        return self.lib._jit_pushargr_f(self.state, u)
 
     def pushargi_f(self, u):
+        self._assert_prolog()
         return self.lib._jit_pushargi_f(self.state, u)
 
     def retr_f(self, u):
+        self._assert_prolog()
         return self.lib._jit_retr_f(self.state, u)
 
     def reti_f(self, u):
+        self._assert_prolog()
         return self.lib._jit_reti_f(self.state, u)
 
     def arg_d(self):
         return Node(self._jit_arg_d(self.state))
 
     def getarg_d(self, u, v):
-            return self.lib._jit_getarg_d(self.state, u, v)
+        self._assert_prolog()
+        return self.lib._jit_getarg_d(self.state, u, v)
 
     def putargr_d(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_putargr_d(self.state, u, v)
 
     def putargi_d(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_putargi_d(self.state, u, v)
 
     def addr_d(self, u, v, w):
@@ -1288,6 +1314,7 @@ class Emitter(State):
         return self._pwd(Code.bunordi_d, node.value, v, w)
 
     def pushargr_d(self, u):
+        self._assert_prolog()
         return self._jit_pushargr_d(self.state, u)
 
     def pushargi_d(self, u):
@@ -1327,57 +1354,73 @@ class Emitter(State):
         return self._wd(Code.movi_d_w, u, v)
 
     def forward_p(self, u):
+        self._assert_prolog()
         return self.lib._jit_forward_p(self.state, u)
 
     def indirect_p(self, u):
+        self._assert_prolog()
         return self.lib._jit_indirect_p(self.state, u)
 
     def target_p(self, u):
+        self._assert_prolog()
         return self.lib._jit_target_p(self.state, u)
 
     def patch(self, u):
+        self._assert_prolog()
         return self.lib._jit_patch(self.state, u)
 
     def patch_at(self, u, v):
         return self.lib._jit_patch_at(self.state, u.value, v.value)
 
     def patch_abs(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_patch_abs(self.state, u, v)
 
     def realize(self, ):
+        self._assert_prolog()
         return self.lib._jit_realize(self.state)
 
     def get_code(self, u):
+        self._assert_prolog()
         return Pointer(self.lib._jit_get_code(self.state, u))
 
     def set_code(self, u, v):
+        self._assert_prolog()
         return self.lib._jit_set_code(self.state, u, v)
 
     def get_data(self, u, v):
+        self._assert_prolog()
         return Pointer(self.lib._jit_get_data(self.state, u, v))
 
     def set_data(self, u, v, w):
+        self._assert_prolog()
         return self.lib._jit_set_data(self.state, u, v, w)
 
     def frame(self, u):
+        self._assert_prolog()
         return self.lib._jit_frame(self.state, u)
 
     def tramp(self, u):
+        self._assert_prolog()
         return self.lib._jit_tramp(self.state, u)
 
     def print_(self):
+        self._assert_prolog()
         return self.lib._jit_print(self.state)
 
     def arg_register_p(self, u):
+        self._assert_prolog()
         return self.lib._jit_arg_register_p(self.state, u)
 
     def callee_save_p(self, u):
         return self.lib._jit_callee_save_p(self.state, u)
 
     def pointer_p(self, u):
+        self._assert_prolog()
         return self.lib._jit_pointer_p(self.state, u)
 
     def get_note(self, n, u, v, w):
+        self._assert_prolog()
         return self.lib._jit_get_note(self.state, n, u, v, w)
 
     def disassemble(self, ):
