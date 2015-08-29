@@ -29,8 +29,9 @@ class State(object):
         """Destroys the state, along with its functions."""
         if hasattr(self, "functions"):
             del self.functions
-        self.lib._jit_destroy_state(self.state)
-        self.lib = None
+        if hasattr(self, "lib") and self.lib is not None:
+            self.lib._jit_destroy_state(self.state)
+            self.lib = None
 
     def __enter__(self):
         return self
