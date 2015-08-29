@@ -18,6 +18,7 @@ from .lyn import (
 
 from .emit import State
 from .node import Node
+from .error import LynError
 
 from .registers import (
     F0,
@@ -49,6 +50,7 @@ __all__ = [
     "F6",
     "F7",
     "Lightning",
+    "LynError",
     "Node",
     "R0",
     "R1",

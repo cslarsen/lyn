@@ -3,6 +3,7 @@ import inspect
 import weakref
 
 from .codes import Code
+from .error import LynError
 from .node import Node
 from .pointer import Pointer
 
@@ -23,7 +24,7 @@ class State(object):
         result in a segfault.
         """
         if self._prolog == False:
-            raise RuntimeError("Requires a prolog")
+            raise LynError("Requires a prolog")
 
     def release(self):
         """Destroys the state, along with its functions."""
@@ -214,8 +215,6 @@ class Emitter(State):
         return self.lib._jit_link(self.state, node.value)
 
     def prolog(self):
-        if self._prolog == True:
-            raise ValueError("Prolog already emitted")
         self._prolog = True
         return self.lib._jit_prolog(self.state)
 

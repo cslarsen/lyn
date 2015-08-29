@@ -205,5 +205,11 @@ class TestLyn(unittest.TestCase):
             for n in range(100):
                 self.assertEqual(odd(n), 456 if (n & 1) else 123)
 
+    def test_prolog_guard(self):
+        with self.lyn.state() as jit:
+            with self.assertRaises(lyn.LynError):
+                jit.name("foo")
+
+
 if __name__ == "__main__":
     unittest.main()
