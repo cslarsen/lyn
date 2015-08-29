@@ -27,7 +27,8 @@ class State(object):
 
     def release(self):
         """Destroys the state, along with its functions."""
-        del self.functions
+        if hasattr(self, "functions"):
+            del self.functions
         self.lib._jit_destroy_state(self.state)
         self.lib = None
 
@@ -190,10 +191,10 @@ class Emitter(State):
         return Pointer(self.lib._jit_emit(self.state))
 
     def live(self, u):
-        return self.lib._w(Code.live, u)
+        return self._w(Code.live, u)
 
     def align(self, u):
-        return self.lib._w(Code.align, u)
+        return self._w(Code.align, u)
 
     def name(self, u):
         return Node(self.lib._jit_name(self.state, u))
@@ -770,16 +771,16 @@ class Emitter(State):
         return self.lib._jit_putargi_f(self.state, u, v)
 
     def addr_f(self, u, v, w):
-        return self.lib._www(Code.addr_f, u, v, w)
+        return self._www(Code.addr_f, u, v, w)
 
     def addi_f(self, u, v, w):
-        return self.lib._wwf(Code.addi_f, u, v, w)
+        return self._wwf(Code.addi_f, u, v, w)
 
     def subr_f(self, u, v, w):
-        return self.lib._www(Code.subr_f, u, v, w)
+        return self._www(Code.subr_f, u, v, w)
 
     def subi_f(self, u, v, w):
-        return self.lib._wwf(Code.subi_f, u, v, w)
+        return self._wwf(Code.subi_f, u, v, w)
 
     def rsbr_f(self, u, v, w):
         return self.jit_subr_f(u, w, v)
