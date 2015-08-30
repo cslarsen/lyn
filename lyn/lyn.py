@@ -73,6 +73,7 @@ class Lightning(object):
         self._load(liblightning)
         self._set_signatures()
         self._init()
+        self._executable = None
 
     def _load(self, liblightning=None):
         if liblightning is None:
@@ -88,7 +89,9 @@ class Lightning(object):
         if program is None:
             program = sys.executable
 
-        self.lib.init_jit(program)
+        # We need to keep a working pointer to the init_jit argument.
+        self._executable = ctypes.c_char_p(six.b(program))
+        self.lib.init_jit(self._executable)
 
     def release(self):
         self.lib.finish_jit()
@@ -149,7 +152,7 @@ class Lightning(object):
         sig(void, "_jit_retval_uc", state_p, gpr_t)
         sig(void, "_jit_retval_us", state_p, gpr_t)
         sig(void, "finish_jit")
-        sig(void, "init_jit", char_p)
+        sig(void, "init_jit", ctypes.c_char_p) # NOTE: Don't use char_p
 
         if wordsize == 64:
             sig(void, "_jit_retval_l", state_p, gpr_t)
