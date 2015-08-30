@@ -2,177 +2,176 @@ from lyn import Register, Lightning
 import ctypes
 import lyn
 import random
+import sys
 import unittest
 
+
 class TestLyn(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.lyn = Lightning()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.lyn.release()
+
     def setUp(self):
-        self.lyn = Lightning()
+        if sys.version.startswith("2.6"):
+            self.lyn = Lightning()
+        self.jit = self.lyn.state()
 
     def tearDown(self):
-        self.lyn.release()
+        self.jit.clear()
+        self.jit.release()
+        if sys.version.startswith("2.6"):
+            self.lyn.release()
 
     def test_nested_states(self):
-        with self.lyn.state() as a:
-            self.assertFalse(a is None)
-            with self.lyn.state() as b:
-                self.assertFalse(b is None)
-                self.assertNotEqual(a, b)
-
-    def test_state(self):
-        with self.lyn.state() as a:
-           self.assertFalse(a is None)
+        self.assertFalse(self.jit is None)
+        with self.lyn.state() as b:
+            self.assertFalse(b is None)
+            self.assertNotEqual(self.jit, b)
 
     def test_empty_code(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            code_ptr = jit.emit()
-            self.assertFalse(code_ptr is None)
+        self.jit.prolog()
+        code_ptr = self.jit.emit()
+        self.assertFalse(code_ptr is None)
 
     def test_single_instruction(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            jit.movi(Register.v0, 123)
-            code_ptr = jit.emit()
-            self.assertFalse(code_ptr is None)
+        self.jit.prolog()
+        self.jit.movi(Register.v0, 123)
+        code_ptr = self.jit.emit()
+        self.assertFalse(code_ptr is None)
 
     def test_addi(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            jit.movi(Register.v1, 22)
-            jit.addi(Register.v2, Register.v1, 33)
-            jit.retr(Register.v2)
-            f = jit.emit_function(lyn.word_t)
-            self.assertEqual(f(), 55)
+        self.jit.prolog()
+        self.jit.movi(Register.v1, 22)
+        self.jit.addi(Register.v2, Register.v1, 33)
+        self.jit.retr(Register.v2)
+        f = self.jit.emit_function(lyn.word_t)
+        self.assertEqual(f(), 55)
 
     def test_addr(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            jit.movi(Register.v1, 22)
-            jit.movi(Register.v2, 44)
-            jit.addr(Register.v3, Register.v1, Register.v2)
-            jit.retr(Register.v3)
-            f = jit.emit_function(lyn.word_t)
-            self.assertEqual(f(), 66)
+        self.jit.prolog()
+        self.jit.movi(Register.v1, 22)
+        self.jit.movi(Register.v2, 44)
+        self.jit.addr(Register.v3, Register.v1, Register.v2)
+        self.jit.retr(Register.v3)
+        f = self.jit.emit_function(lyn.word_t)
+        self.assertEqual(f(), 66)
 
     def test_execution(self):
-        with self.lyn.state() as jit:
-            # Create a function that returns 123
-            jit.prolog()
-            jit.movi(Register.v0, 123)
-            jit.movi(Register.v1, 456)
-            jit.retr(Register.v0)
-            code = jit.emit()
-            self.assertFalse(code is None)
-            self.assertFalse(code.value is None)
+        # Create a function that returns 123
+        self.jit.prolog()
+        self.jit.movi(Register.v0, 123)
+        self.jit.movi(Register.v1, 456)
+        self.jit.retr(Register.v0)
+        code = self.jit.emit()
+        self.assertFalse(code is None)
+        self.assertFalse(code.value is None)
 
-            make_func = ctypes.CFUNCTYPE(ctypes.c_int)
-            func = make_func(code.value)
-            result = func()
-            self.assertTrue(result is not None)
-            self.assertTrue(isinstance(result, int))
-            self.assertEqual(result, 123)
+        make_func = ctypes.CFUNCTYPE(ctypes.c_int)
+        func = make_func(code.value)
+        result = func()
+        self.assertTrue(result is not None)
+        self.assertTrue(isinstance(result, int))
+        self.assertEqual(result, 123)
 
     def test_incr(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            num = jit.arg()
-            jit.getarg(Register.r0, num)
-            jit.addi(Register.r0, Register.r0, 1)
-            jit.retr(Register.r0)
+        self.jit.prolog()
+        num = self.jit.arg()
+        self.jit.getarg(Register.r0, num)
+        self.jit.addi(Register.r0, Register.r0, 1)
+        self.jit.retr(Register.r0)
 
-            incr = jit.emit_function(lyn.word_t, [lyn.word_t])
+        incr = self.jit.emit_function(lyn.word_t, [lyn.word_t])
 
-            for n in range(-1000, 1000):
-                self.assertEqual(incr(n), n+1)
+        for n in range(-1000, 1000):
+            self.assertEqual(incr(n), n+1)
 
-            bits = lyn.wordsize
-            self.assertEqual(incr(2**(bits-1)-2), 2**(bits-1)-1)
-            self.assertEqual(incr(2**(bits-1)-1), -2**(bits-1))
+        bits = lyn.wordsize
+        self.assertEqual(incr(2**(bits-1)-2), 2**(bits-1)-1)
+        self.assertEqual(incr(2**(bits-1)-1), -2**(bits-1))
 
     def test_roundtrip_mul(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            n = jit.arg()
-            jit.getarg(Register.r0, n)
-            jit.muli(Register.r0, Register.r0, 1)
-            jit.retr(Register.r0)
+        self.jit.prolog()
+        n = self.jit.arg()
+        self.jit.getarg(Register.r0, n)
+        self.jit.muli(Register.r0, Register.r0, 1)
+        self.jit.retr(Register.r0)
 
-            mul1 = jit.emit_function(lyn.word_t, [lyn.word_t])
-            bits = lyn.wordsize
+        mul1 = self.jit.emit_function(lyn.word_t, [lyn.word_t])
+        bits = lyn.wordsize
 
-            for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
-                self.assertEqual(mul1(n), n)
+        for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+            self.assertEqual(mul1(n), n)
 
     def test_mul2(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
-            num = jit.arg()
-            jit.getarg(Register.r0, num)
-            jit.muli(Register.r0, Register.r0, 2)
-            jit.retr(Register.r0)
+        self.jit.prolog()
+        num = self.jit.arg()
+        self.jit.getarg(Register.r0, num)
+        self.jit.muli(Register.r0, Register.r0, 2)
+        self.jit.retr(Register.r0)
 
-            mul2 = jit.emit_function(lyn.word_t, [lyn.word_t])
+        mul2 = self.jit.emit_function(lyn.word_t, [lyn.word_t])
 
-            for n in range(-1000, 1000):
-                self.assertEqual(mul2(n), 2*n)
+        for n in range(-1000, 1000):
+            self.assertEqual(mul2(n), 2*n)
 
-            # Test again with random numbers
-            bits = lyn.wordsize
-            hmin = (-2**(bits-1))//2
-            hmax = (2**(bits-1)-1)//2
+        # Test again with random numbers
+        bits = lyn.wordsize
+        hmin = (-2**(bits-1))//2
+        hmax = (2**(bits-1)-1)//2
 
-            self.assertEqual(mul2(hmin), 2*hmin)
-            self.assertEqual(mul2(hmax), 2*hmax)
+        self.assertEqual(mul2(hmin), 2*hmin)
+        self.assertEqual(mul2(hmax), 2*hmax)
 
-            for _ in range(1000):
-                n = random.randint(-2**(bits-1)//2, (2**(bits-1)-1)//2)
-                self.assertEqual(mul2(n), n*2)
+        for _ in range(1000):
+            n = random.randint(-2**(bits-1)//2, (2**(bits-1)-1)//2)
+            self.assertEqual(mul2(n), n*2)
 
     def test_roundtrip_static(self):
-        with self.lyn.state() as jit:
-            bits = lyn.wordsize
+        bits = lyn.wordsize
 
-            for number in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
-                with self.lyn.state() as jit:
-                    jit.prolog()
-                    jit.movi(Register.r0, number)
-                    jit.retr(Register.r0)
-                    func = jit.emit_function(lyn.word_t, [])
-                    self.assertEqual(func(), number)
-
-    def test_roundtrip_arg(self):
-        with self.lyn.state() as jit:
-            bits = lyn.wordsize
-
+        for number in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
             with self.lyn.state() as jit:
                 jit.prolog()
-                num = jit.arg()
-                jit.getarg(Register.r0, num)
+                jit.movi(Register.r0, number)
                 jit.retr(Register.r0)
-                func = jit.emit_function(lyn.word_t, [lyn.word_t])
+                func = jit.emit_function(lyn.word_t, [])
+                self.assertEqual(func(), number)
 
-                for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
-                    self.assertEqual(func(n), n)
+    def test_roundtrip_arg(self):
+        bits = lyn.wordsize
+        self.jit.prolog()
+        num = self.jit.arg()
+        self.jit.getarg(Register.r0, num)
+        self.jit.retr(Register.r0)
+        func = self.jit.emit_function(lyn.word_t, [lyn.word_t])
+
+        for n in [0, 1, -1, 2**(bits-1)-1, -2**(bits-1)]:
+            self.assertEqual(func(n), n)
 
     def test_strlen(self):
         libc = self.lyn.load("c")
-        with self.lyn.state() as jit:
-            jit.prolog()
-            jit.getarg(Register.r0, jit.arg())
-            jit.pushargr(Register.r0)
-            jit.finishi(libc.strlen)
-            jit.retval(Register.r0)
-            jit.retr(Register.r0)
-            jit.epilog()
+        self.jit.prolog()
+        self.jit.getarg(Register.r0, self.jit.arg())
+        self.jit.pushargr(Register.r0)
+        self.jit.finishi(libc.strlen)
+        self.jit.retval(Register.r0)
+        self.jit.retr(Register.r0)
+        self.jit.epilog()
 
-            strlen = jit.emit_function(lyn.word_t, [lyn.char_p])
+        strlen = self.jit.emit_function(lyn.word_t, [lyn.char_p])
 
-            self.assertEqual(strlen(""), 0)
-            self.assertEqual(strlen("h"), 1)
-            self.assertEqual(strlen("he"), 2)
-            self.assertEqual(strlen("hello"), 5)
+        self.assertEqual(strlen(""), 0)
+        self.assertEqual(strlen("h"), 1)
+        self.assertEqual(strlen("he"), 2)
+        self.assertEqual(strlen("hello"), 5)
 
     def test_sequential_states(self):
+        self.assertFalse(self.jit is None)
+
         with self.lyn.state() as a:
             self.assertFalse(a is None)
 
@@ -181,34 +180,35 @@ class TestLyn(unittest.TestCase):
             self.assertFalse(b is None)
 
     def test_forward_branch(self):
-        with self.lyn.state() as jit:
-            jit.prolog()
+        self.jit.prolog()
 
-            arg = jit.arg()
-            jit.getarg(Register.r0, arg)
+        arg = self.jit.arg()
+        self.jit.getarg(Register.r0, arg)
 
-            true = jit.forward()
-            jit.andi(Register.r0, Register.r0, 1)
-            jump = jit.beqi(true, Register.r0, 1)
-            jit.patch_at(jump, true)
+        true = self.jit.forward()
+        self.jit.andi(Register.r0, Register.r0, 1)
+        jump = self.jit.beqi(true, Register.r0, 1)
+        self.jit.patch_at(jump, true)
 
-            # False
-            jit.reti(123)
+        # False
+        self.jit.reti(123)
 
-            # True
-            jit.link(true)
-            jit.reti(456)
+        # True
+        self.jit.link(true)
+        self.jit.reti(456)
 
-            jit.epilog()
+        self.jit.epilog()
 
-            odd = jit.emit_function(lyn.word_t, [lyn.word_t])
-            for n in range(100):
-                self.assertEqual(odd(n), 456 if (n & 1) else 123)
+        odd = self.jit.emit_function(lyn.word_t, [lyn.word_t])
+        for n in range(100):
+            self.assertEqual(odd(n), 456 if (n & 1) else 123)
 
     def test_prolog_guard(self):
-        with self.lyn.state() as jit:
+        if sys.version.startswith("2.6"):
+            self.assertRaises(lyn.LynError, self.jit.name, "foo")
+        else:
             with self.assertRaises(lyn.LynError):
-                jit.name("foo")
+                self.jit.name("foo")
 
 
 if __name__ == "__main__":
