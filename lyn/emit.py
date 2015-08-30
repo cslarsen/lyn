@@ -16,6 +16,7 @@ class State(object):
         self.lib = lib
         self.state = state
         self._prolog = False
+        self._clear = False
 
     def _assert_prolog(self):
         """Used to guard against missing prologs.
@@ -26,10 +27,24 @@ class State(object):
         if self._prolog == False:
             raise LynError("Requires a prolog")
 
+    def _assert_not_cleared(self):
+        """Guards against a previous clear call.
+
+        The ``clear`` method releases some memory needed during code assembly,
+        emitting and debugging. After you have called ``emit``, you don't need
+        this information --- if all you need is to call your generated
+        functions --- but you need it to generate more code.
+        """
+        if self._clear == True:
+            raise LynError("State has been cleared.")
+
     def release(self):
         """Destroys the state, along with its functions."""
+        self.clear()
+
         if hasattr(self, "functions"):
             del self.functions
+
         if hasattr(self, "lib") and self.lib is not None:
             self.lib._jit_destroy_state(self.state)
             self.lib = None
@@ -43,7 +58,9 @@ class State(object):
     def clear(self):
         """Clears state so it can be used for generating entirely new
         instructions."""
-        self.lib._jit_clear_state(self.state)
+        if not self._clear:
+            self.lib._jit_clear_state(self.state)
+            self._clear = True
 
     def emit_function(self, return_type=None, argtypes=[], proxy=True):
         """Compiles code and returns a Python-callable function."""
@@ -156,6 +173,7 @@ class Emitter(State):
 
     def getarg_l(self, register, node):
         self._assert_prolog()
+        self._assert_not_cleared()
         return Node(self.lib._jit_getarg_l(self.state, register, node.value))
 
     def putargr(self, register, node):
@@ -200,6 +218,7 @@ class Emitter(State):
 
     def name(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return Node(self.lib._jit_name(self.state, u))
 
     def label(self):
@@ -220,34 +239,42 @@ class Emitter(State):
 
     def ellipsis(self):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_ellipsis(self.state)
 
     def allocai(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_allocai(self.state, u)
 
     def arg(self):
         self._assert_prolog()
+        self._assert_not_cleared()
         return Node(self.lib._jit_arg(self.state))
 
     def getarg_c(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_c(self.state, u, v)
 
     def getarg_uc(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_uc(self.state, u, v)
 
     def getarg_s(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_s(self.state, u, v)
 
     def getarg_us(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_us(self.state, u, v)
 
     def getarg_i(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_i(self.state, u, v)
 
     def addr(self, u, v, w):
@@ -708,34 +735,42 @@ class Emitter(State):
 
     def prepare(self, ):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_prepare(self.state)
 
     def pushargr(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_pushargr(self.state, u)
 
     def pushargi(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_pushargi(self.state, u)
 
     def finishr(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_finishr(self.state, u)
 
     def finishi(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_finishi(self.state, u)
 
     def ret(self, ):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_ret(self.state)
 
     def retr(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_retr(self.state, u)
 
     def reti(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_reti(self.state, u)
 
     def retval(self, u):
@@ -746,6 +781,7 @@ class Emitter(State):
 
     def retval_f(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_retval_f(self.state, u)
 
     def retval_l(self, u):
@@ -771,6 +807,7 @@ class Emitter(State):
 
     def epilog(self, ):
         self._assert_prolog()
+        self._assert_not_cleared()
         self._prolog = False
         return self.lib._jit_epilog(self.state)
 
@@ -779,14 +816,17 @@ class Emitter(State):
 
     def getarg_f(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_f(self.state, u, v)
 
     def putargr_f(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_putargr_f(self.state, u, v)
 
     def putargi_f(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_putargi_f(self.state, u, v)
 
     def addr_f(self, u, v, w):
@@ -1037,18 +1077,22 @@ class Emitter(State):
 
     def pushargr_f(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_pushargr_f(self.state, u)
 
     def pushargi_f(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_pushargi_f(self.state, u)
 
     def retr_f(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_retr_f(self.state, u)
 
     def reti_f(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_reti_f(self.state, u)
 
     def arg_d(self):
@@ -1056,14 +1100,17 @@ class Emitter(State):
 
     def getarg_d(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_getarg_d(self.state, u, v)
 
     def putargr_d(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_putargr_d(self.state, u, v)
 
     def putargi_d(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_putargi_d(self.state, u, v)
 
     def addr_d(self, u, v, w):
@@ -1314,6 +1361,7 @@ class Emitter(State):
 
     def pushargr_d(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self._jit_pushargr_d(self.state, u)
 
     def pushargi_d(self, u):
@@ -1354,18 +1402,22 @@ class Emitter(State):
 
     def forward_p(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_forward_p(self.state, u)
 
     def indirect_p(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_indirect_p(self.state, u)
 
     def target_p(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_target_p(self.state, u)
 
     def patch(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_patch(self.state, u)
 
     def patch_at(self, u, v):
@@ -1373,42 +1425,52 @@ class Emitter(State):
 
     def patch_abs(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_patch_abs(self.state, u, v)
 
     def realize(self, ):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_realize(self.state)
 
     def get_code(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return Pointer(self.lib._jit_get_code(self.state, u))
 
     def set_code(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_set_code(self.state, u, v)
 
     def get_data(self, u, v):
         self._assert_prolog()
+        self._assert_not_cleared()
         return Pointer(self.lib._jit_get_data(self.state, u, v))
 
     def set_data(self, u, v, w):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_set_data(self.state, u, v, w)
 
     def frame(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_frame(self.state, u)
 
     def tramp(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_tramp(self.state, u)
 
     def print_(self):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_print(self.state)
 
     def arg_register_p(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_arg_register_p(self.state, u)
 
     def callee_save_p(self, u):
@@ -1416,10 +1478,12 @@ class Emitter(State):
 
     def pointer_p(self, u):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_pointer_p(self.state, u)
 
     def get_note(self, n, u, v, w):
         self._assert_prolog()
+        self._assert_not_cleared()
         return self.lib._jit_get_note(self.state, n, u, v, w)
 
     def disassemble(self, ):
