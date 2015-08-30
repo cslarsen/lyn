@@ -28,7 +28,7 @@ class State(object):
             raise LynError("Requires a prolog")
 
     def _assert_not_cleared(self):
-        """Guards against a previous clear call.
+        """Guards against a previous clear call to avoid segfaults.
 
         The ``clear`` method releases some memory needed during code assembly,
         emitting and debugging. After you have called ``emit``, you don't need
