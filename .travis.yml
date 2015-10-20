@@ -1,7 +1,13 @@
 language: python
 
 python:
+  - "2.6"
   - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "nightly"
 
 before_install:
   - curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.0.tar.gz > /tmp/lightning-2.1.0.tar.gz

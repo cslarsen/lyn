@@ -1,5 +1,6 @@
 lyn — Python bindings for GNU Lightning
 =======================================
+|travis-status| |versions| |license|
 
 Lyn brings GNU Lightning to Python::
 
@@ -240,3 +241,17 @@ Copyright (C) 2015 Christian Stigen Larsen
 
 Distributed under the LGPL v2.1 or later. You are allowed to change the license
 on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
+
+
+.. |travis-status| image:: https://travis-ci.org/cslarsen/lyn.svg?branch=master
+    :alt: Travis build status
+    :scale: 100%
+    :target: https://travis-ci.org/cslarsen/lyn
+
+.. |license| image:: https://img.shields.io/badge/license-LGPL%20v2.1%2B.svg
+    :target: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+    :alt: Project License
+
+.. |versions| image:: https://img.shields.io/badge/python-2.6%2C%202.7%2C%203.2%2C%203.3%2C%203.4-blue.svg
+    :target: https://pypi.python.org/pypi/lyn/
+    :alt: Supported Python versions
