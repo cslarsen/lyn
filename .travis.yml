@@ -15,5 +15,6 @@ install:
   - python setup.py -q install
 
 script:
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/tmp/lightning/lib
-  - python setup.py test
+  - LD_LIBRARY_PATH=/tmp/lightning/lib:$LD_LIBRARY_PATH python setup.py test
+
+sudo: false
