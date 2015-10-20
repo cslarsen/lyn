@@ -12,13 +12,11 @@ before_install:
   - make -j
   - make -j install
   - cd ..
-  - find $HOME/usr
 
 install:
-  - export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
   - python setup.py -q install
 
 script:
-  - python setup.py test
+  - LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH LD_PRELOAD=$HOME/usr/lib/liblightning.so python setup.py test
 
 sudo: false
