@@ -248,7 +248,7 @@ on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
     :scale: 100%
     :target: https://travis-ci.org/cslarsen/lyn
 
-.. |license| image:: https://img.shields.io/badge/license-LGPL%20v2.1%2B.svg
+.. |license| image:: https://img.shields.io/badge/license-LGPL%20v2.1%2B-blue.svg
     :target: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
     :alt: Project License
 
