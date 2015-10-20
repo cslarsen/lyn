@@ -26,6 +26,9 @@ class TestLyn(unittest.TestCase):
         if sys.version.startswith("2.6"):
             self.lyn.release()
 
+    def test_library(self):
+        self.assertTrue(self.lyn.lib is not None)
+
     def test_nested_states(self):
         self.assertFalse(self.jit is None)
         with self.lyn.state() as b:

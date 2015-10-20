@@ -10,8 +10,7 @@ before_install:
   - ./configure --prefix=/tmp/usr --enable-shared --disable-static --disable-disassembler
   - make -j install
   - cd ..
-  - export LD_LIBRARY_PATH=/tmp/usr:$LD_LIBRARY_PATH
-  - find /tmp/usr
+  - export LD_LIBRARY_PATH=/tmp/usr/lib:$LD_LIBRARY_PATH
 
 install:
   - python setup.py -q install
