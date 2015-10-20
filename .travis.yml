@@ -7,15 +7,15 @@ before_install:
   - curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.0.tar.gz > /tmp/lightning-2.1.0.tar.gz
   - tar xfv /tmp/lightning-2.1.0.tar.gz
   - cd lightning-2.1.0
-  - mkdir /opt-local
-  - ./configure --prefix=/opt-local --enable-shared --disable-static --disable-disassembler
+  - mkdir $HOME/usr
+  - ./configure --prefix=$HOME/usr --enable-shared --disable-static --disable-disassembler
   - make -j
   - make -j install
   - cd ..
-  - find /opt-local
+  - find $HOME/usr
 
 install:
-  - export LD_LIBRARY_PATH=/opt-local/lib:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$HOME/usr/lib:$LD_LIBRARY_PATH
   - python setup.py -q install
 
 script:
