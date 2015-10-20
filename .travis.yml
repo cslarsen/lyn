@@ -10,10 +10,10 @@ before_install:
   - ./configure --enable-shared --disable-static --disable-disassembler --prefix=/tmp/lightning
   - make -j install
   - cd ..
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/tmp/lightning/lib
 
 install:
   - python setup.py -q install
 
 script:
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/tmp/lightning/lib
   - python setup.py test
