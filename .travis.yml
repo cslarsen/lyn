@@ -8,6 +8,14 @@ python:
   - "3.5"
   - "nightly"
 
+before_install:
+  - sudo apt-get install lightning
+  - curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.0.tar.gz > /tmp/lightning-2.1.0.tar.gz
+  - tar xfv /tmp/lightning-2.1.0.tar.gz
+  - cd /tmp/lightning-2.1.0
+  - ./configure --enable-shared --disable-static --disable-disassembler
+  - make -j install
+
 install:
   - python setup.py -q install
 
