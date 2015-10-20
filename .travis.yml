@@ -7,14 +7,16 @@ before_install:
   - curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.0.tar.gz > /tmp/lightning-2.1.0.tar.gz
   - tar xfv /tmp/lightning-2.1.0.tar.gz
   - cd lightning-2.1.0
-  - ./configure --enable-shared --disable-static --disable-disassembler --prefix=/tmp/lightning
+  - ./configure --prefix=/tmp/usr --enable-shared --disable-static --disable-disassembler
   - make -j install
   - cd ..
+  - export LD_LIBRARY_PATH=/tmp/usr:$LD_LIBRARY_PATH
+  - find /tmp/usr
 
 install:
   - python setup.py -q install
 
 script:
-  - LD_LIBRARY_PATH=/tmp/lightning/lib:$LD_LIBRARY_PATH python setup.py test
+  - python setup.py test
 
 sudo: false
