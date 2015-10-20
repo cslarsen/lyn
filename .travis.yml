@@ -6,9 +6,10 @@ python:
 before_install:
   - curl http://ftp.gnu.org/gnu/lightning/lightning-2.1.0.tar.gz > /tmp/lightning-2.1.0.tar.gz
   - tar xfv /tmp/lightning-2.1.0.tar.gz
-  - cd /tmp/lightning-2.1.0
+  - cd lightning-2.1.0
   - ./configure --enable-shared --disable-static --disable-disassembler
   - make -j install
+  - cd ..
 
 install:
   - python setup.py -q install
