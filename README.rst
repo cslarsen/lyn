@@ -248,10 +248,10 @@ on a particular copy to the LGPL v3.0, the GPL v2.0 or the GPL v3.0.
     :scale: 100%
     :target: https://travis-ci.org/cslarsen/lyn
 
-.. |license| image:: https://img.shields.io/badge/license-LGPL%20v2.1%2B-blue.svg
+.. |license| image:: https://img.shields.io/badge/license-LGPL%20v2.1%2B-blue.png
     :target: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
     :alt: Project License
 
-.. |versions| image:: https://img.shields.io/badge/python-2.6%2C%202.7%2C%203.2%2C%203.3%2C%203.4-blue.svg
+.. |versions| image:: https://img.shields.io/badge/python-2.6%2C%202.7%2C%203.2%2C%203.3%2C%203.4-blue.png
     :target: https://pypi.python.org/pypi/lyn/
     :alt: Supported Python versions
